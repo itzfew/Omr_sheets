@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Quiz App</title>
+  <link rel="stylesheet" href="styles.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+  <div class="container">
+    <h3>OMR Checking</h3>
+    <label for="testName">Test Name:</label>
+    <input type="text" id="testName" class="input">
+    <label for="numQuestions">Number of Questions:</label>
+    <input type="number" id="numQuestions" min="1" max="200" value="15" class="input">
+    <button id="startBtn" class="button start-btn">Start Quiz</button>
+    <div id="timer" class="timer" style="display:none;">Time Elapsed: <span id="elapsedTime">00:00:00</span></div>
+    <div id="slide1" class="slide">
+      <p>Choose options for respective questions:</p>
+      <div class="question-container"></div>
+    </div>
+    <button id="nextBtn" class="button next-btn" style="display:none">Next</button>
+    <button id="prevBtn" class="button prev-btn" style="display:none">Previous</button>
+    <button id="submitBtn" class="button submit-btn" style="display:none">Submit</button>
+    <div id="slide2" class="slide">
+      <p>Choose correct answers for respective questions:</p>
+      <div class="question-container"></div>
+    </div>
+    <div id="slide3" class="slide"></div>
+    <div id="examList"></div>
+    <div class="chart-container">
+      <canvas id="resultsChart"></canvas>
+    </div>
+    <div class="comparison-container" id="comparisonResults"></div>
+  </div
+      <script src="script.js"></script>
+</body>
+</html>
