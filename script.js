@@ -370,9 +370,9 @@ document.addEventListener("DOMContentLoaded", function() {
         <thead>
           <tr>
             <th>Comparison</th>
-            <th>Test Name</th>
+            <th>Name</th>
             <th>Score</th>
-            <th>Percentage</th>
+            <th>%age</th>
           </tr>
         </thead>
         <tbody>
