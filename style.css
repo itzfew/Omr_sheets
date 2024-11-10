@@ -88,11 +88,11 @@ h3 {
 .button {
   display: inline-block;
   margin-top: 20px;
-  padding: 25px 50px;
+  padding: 15px 30px;
   border: none;
   border-radius: 30px;
   cursor: pointer;
-  font-size: 20px;
+  font-size: 16px;
   transition: background-color 0.3s, transform 0.3s;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
@@ -113,6 +113,7 @@ h3 {
 .next-btn, .prev-btn {
   background-color: #007bff;
   color: white;
+  padding: 15px 30px;
 }
 
 .next-btn:hover, .prev-btn:hover {
