@@ -113,7 +113,6 @@ h3 {
 .next-btn, .prev-btn {
   background-color: #007bff;
   color: white;
-  padding: 15px 30px;
 }
 
 .next-btn:hover, .prev-btn:hover {
