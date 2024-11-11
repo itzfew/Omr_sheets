@@ -1,4 +1,99 @@
 document.addEventListener("DOMContentLoaded", function() {
+  // UI Elements
+  const loginBtn = document.getElementById("loginBtn");
+  const signupBtn = document.getElementById("signupBtn");
+  const logoutBtn = document.getElementById("logoutBtn");
+  const authModal = document.getElementById("authModal");
+  const closeAuthModal = document.getElementById("closeAuthModal");
+  const authForm = document.getElementById("authForm");
+  const authEmail = document.getElementById("authEmail");
+  const authPassword = document.getElementById("authPassword");
+
+  // Show login/signup modal
+  loginBtn.addEventListener("click", () => openAuthModal("login"));
+  signupBtn.addEventListener("click", () => openAuthModal("signup"));
+  closeAuthModal.addEventListener("click", closeAuthModalFn);
+
+  // Handle login and signup forms
+  authForm.addEventListener("submit", (e) => {
+    e.preventDefault();
+    const email = authEmail.value.trim();
+    const password = authPassword.value.trim();
+    const action = authForm.dataset.action; // 'login' or 'signup'
+
+    if (action === "login") {
+      signInUser(email, password);
+    } else {
+      signUpUser(email, password);
+    }
+  });
+
+  // Logout user
+  logoutBtn.addEventListener("click", () => {
+    auth.signOut().then(() => {
+      alert("Logged out successfully!");
+      updateUI();
+    }).catch((error) => console.error("Error logging out:", error));
+  });
+
+  // Firebase auth state listener
+  auth.onAuthStateChanged(user => {
+    if (user) {
+      updateUI(user);
+      displayExamList(user);  // Display user-specific exams
+    } else {
+      updateUI();
+    }
+  });
+
+  function openAuthModal(action) {
+    authModal.style.display = "block";
+    authForm.dataset.action = action; // Set form action
+    authEmail.value = "";
+    authPassword.value = "";
+  }
+
+  function closeAuthModalFn() {
+    authModal.style.display = "none";
+  }
+
+  function signUpUser(email, password) {
+    auth.createUserWithEmailAndPassword(email, password)
+      .then((userCredential) => {
+        alert("Signup successful! You can now login.");
+        closeAuthModalFn();
+      })
+      .catch((error) => {
+        console.error("Error signing up:", error);
+        alert(error.message);
+      });
+  }
+
+  function signInUser(email, password) {
+    auth.signInWithEmailAndPassword(email, password)
+      .then((userCredential) => {
+        alert("Login successful!");
+        closeAuthModalFn();
+      })
+      .catch((error) => {
+        console.error("Error logging in:", error);
+        alert(error.message);
+      });
+  }
+
+  function updateUI(user = null) {
+    if (user) {
+      loginBtn.style.display = "none";
+      signupBtn.style.display = "none";
+      logoutBtn.style.display = "block";
+    } else {
+      loginBtn.style.display = "block";
+      signupBtn.style.display = "block";
+      logoutBtn.style.display = "none";
+    }
+  }
+
+document.addEventListener("DOMContentLoaded", function() {
   const startBtn = document.getElementById("startBtn");
   const nextBtn = document.getElementById("nextBtn");
   const prevBtn = document.getElementById("prevBtn");
@@ -260,7 +355,15 @@ document.addEventListener("DOMContentLoaded", function() {
     slide3.insertBefore(resultBtn, slide3.firstChild);
   }
 
-  function saveResultsToFirebase(testName, results, score, maxScore) {
+  
+  // Modify existing function to save results to Firebase under the logged-in user
+  function saveResultsToFirebase(testName, results, score, maxScore, user) {
+    if (!user) {
+      alert("Please log in to save results.");
+      return;
+    }
+
+    const userId = user.uid; // Get logged-in user's UID
     const examData = {
       testName,
       results,
@@ -269,22 +372,27 @@ document.addEventListener("DOMContentLoaded", function() {
       date: new Date().toISOString()
     };
 
-    // Save the results to Firebase
-    const examsRef = database.ref('exams');
+    // Save the results to Firebase under the user's ID
+    const examsRef = database.ref(`exams/${userId}`);
     examsRef.push(examData)
       .then(() => {
         console.log("Exam results saved to Firebase!");
-        displayExamList();  // Refresh the exam list after saving
+        displayExamList(user);  // Refresh the exam list after saving
       })
       .catch(error => {
         console.error("Error saving exam results to Firebase:", error);
       });
   }
 
-  function displayExamList() {
-    const examsRef = database.ref('exams');
+// Modify the display function to show only the logged-in user's exams
+  function displayExamList(user) {
+    if (!user) {
+      return;  // If no user is logged in, return early
+    }
+
+    const examsRef = database.ref(`exams/${user.uid}`);
     examsRef.once('value', snapshot => {
-      const exams = snapshot.val() || [];
+      const exams = snapshot.val() || {};
       examList.innerHTML = "";
       Object.keys(exams).forEach(examId => {
         const exam = exams[examId];
@@ -320,7 +428,12 @@ document.addEventListener("DOMContentLoaded", function() {
     slide3.style.display = "block";
     slide3.insertBefore(resultBtn, slide3.firstChild);
   }
+});
 
+
+
+
+  
   function updateChart() {
     const examsRef = database.ref('exams');
     examsRef.once('value', snapshot => {
