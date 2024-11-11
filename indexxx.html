@@ -8,38 +8,42 @@
   <style>
     body {
       font-family: 'Poppins', sans-serif;
-      background-color: #f5f5f5;
+      background-color: #1c1c1c;
       margin: 0;
       padding: 0;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      color: #333;
+      color: white;
       overflow: hidden;
     }
 
     h1 {
-      font-size: 2.5rem;
-      color: #4CAF50;
+      font-size: 1rem;
+      color: #ff5722;
       margin-bottom: 20px;
       text-align: center;
       font-weight: 600;
       letter-spacing: 1px;
+      text-transform: uppercase;
+      text-shadow: 2px 2px 10px rgba(255, 87, 34, 0.8);
     }
 
     .streak {
-      font-size: 2rem;
+      font-size: 2.2rem;
       font-weight: 600;
-      color: #4CAF50;
+      color: #ff9800;
       margin-bottom: 20px;
+      text-shadow: 2px 2px 10px rgba(255, 152, 0, 0.7);
     }
 
     .message {
       font-size: 1.1rem;
-      color: #333;
+      color: #ffcc00;
       text-align: center;
       margin-bottom: 25px;
+      text-shadow: 2px 2px 10px rgba(255, 193, 7, 0.7);
     }
 
     .day-container {
@@ -53,7 +57,7 @@
     .day-circle {
       width: 50px;
       height: 50px;
-      background-color: #607D8B;
+      background-color: #ff5722;
       color: white;
       border-radius: 50%;
       display: flex;
@@ -61,52 +65,55 @@
       justify-content: center;
       font-size: 14px;
       cursor: pointer;
-      transition: background-color 0.3s ease, transform 0.3s ease;
+      transition: background-color 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease;
+      box-shadow: 0 0 10px rgba(255, 87, 34, 0.6);
     }
 
     .day-circle:hover {
       transform: scale(1.1);
+      box-shadow: 0 0 20px rgba(255, 87, 34, 1);
     }
 
     .marked {
-      background-color: #FF5722;
+      background-color: #ff9800;
     }
 
     .current-day {
-      background-color: #FFC107;
+      background-color: #ffcc00;
     }
 
     .marked-today {
-      background-color: #FF4081;
+      background-color: #ff4081;
     }
 
     .button {
       padding: 14px 25px;
       font-size: 1.1rem;
-      background-color: #4CAF50;
+      background: linear-gradient(45deg, #ff5722, #ff9800);
       color: white;
       border: none;
       border-radius: 50px;
       cursor: pointer;
       width: 100%;
       max-width: 300px;
-      transition: background-color 0.3s ease, transform 0.3s ease;
+      transition: background 0.3s ease, transform 0.3s ease;
       margin-bottom: 30px;
+      box-shadow: 0 5px 15px rgba(255, 87, 34, 0.5);
     }
 
     .button:disabled {
-      background-color: #BDBDBD;
+      background: linear-gradient(45deg, #bdbdbd, #9e9e9e);
       cursor: not-allowed;
     }
 
     .button:hover {
-      background-color: #388E3C;
+      background: linear-gradient(45deg, #ff9800, #ff5722);
       transform: scale(1.05);
     }
 
     .progress-bar {
       width: 100%;
-      background-color: #f0f0f0;
+      background-color: #444;
       border-radius: 10px;
       height: 8px;
       margin-top: 10px;
@@ -114,33 +121,34 @@
 
     .progress {
       height: 100%;
-      background-color: #4CAF50;
+      background-color: #ff5722;
       border-radius: 10px;
     }
 
     .completed .progress {
-      background-color: #FF9800;
+      background-color: #ff9800;
     }
 
     .target-item {
-      background-color: white;
+      background-color: #2c2c2c;
       padding: 20px;
       margin-bottom: 20px;
       border-radius: 12px;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
       width: 100%;
       max-width: 450px;
       text-align: center;
       transition: transform 0.3s ease, box-shadow 0.3s ease;
+      color: white;
     }
 
     .target-item:hover {
       transform: translateY(-5px);
-      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.2);
+      box-shadow: 0 6px 18px rgba(255, 87, 34, 0.6);
     }
 
     .target-item i {
-      color: #4CAF50;
+      color: #ff5722;
       font-size: 24px;
       display: none;
     }
@@ -152,7 +160,7 @@
     .target-item span {
       font-size: 1rem;
       font-weight: 600;
-      color: #333;
+      color: #ff5722;
     }
 
     .target-item .progress-bar {
@@ -161,20 +169,21 @@
 
     .target-message {
       font-size: 1rem;
-      color: #FF9800;
+      color: #ff9800;
       font-weight: 600;
       text-align: center;
       margin-bottom: 20px;
+      text-shadow: 2px 2px 10px rgba(255, 152, 0, 0.6);
     }
 
     /* Responsive Design */
     @media screen and (max-width: 768px) {
       h1 {
-        font-size: 2rem;
+        font-size: 2.2rem;
       }
 
       .streak {
-        font-size: 1.5rem;
+        font-size: 1.7rem;
       }
 
       .day-circle {
@@ -213,6 +222,7 @@
   </style>
 </head>
 <body>
+  <h1>Study Streak Tracker</h1>
   <div id="currentDate"></div>
   <div class="streak" id="streak">Streak: <span id="streakCount">0</span></div>
   <div class="message" id="message"></div>
