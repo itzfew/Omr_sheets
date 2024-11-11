@@ -219,6 +219,45 @@
         padding: 10px 16px;
       }
     }
+    #targetList {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 0 20px; /* Optional: Add some padding for spacing */
+  box-sizing: border-box;
+}
+
+.target-item {
+  width: 100%;
+  max-width: 500px; /* Ensure they don't grow too large on wide screens */
+  padding: 20px;
+  margin-bottom: 20px;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  text-align: center;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  color: white;
+}
+
+.target-item:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 6px 18px rgba(255, 87, 34, 0.6);
+}
+
+/* Optional: Add a margin for responsiveness */
+@media screen and (max-width: 768px) {
+  .target-item {
+    padding: 15px;
+  }
+}
+
+@media screen and (max-width: 480px) {
+  .target-item {
+    padding: 10px;
+  }
+}
+
   </style>
 </head>
 <body>
