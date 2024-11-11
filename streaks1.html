@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Study Streak Tracker</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+<style>
+  body {
+    font-family: 'Comic Sans MS', sans-serif;
+    text-align: center;
+    background-color: #ffe8e8;
+    margin: 0;
+    padding: 0;
+    border: 0px solid #0000FF;
+    position: relative;
+  }
+  h1 {
+    color: #e57373;
+  }
+  #container {
+    width: 77%;
+   
+    margin: 0px auto;
+    background-color: #ffffff;
+    border-radius: 0px;
+    box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.1);
+    padding: 40px;
+    position: relative;
+    z-index: 1;
+  }
+  #streak {
+    font-size: 24px;
+    margin-bottom: 20px;
+    border: 3px solid #e57373;
+    border-radius: 10px;
+    padding: 10px;
+    background-color: #ffffff;
+  }
+  #message {
+    font-size: 18px;
+    margin-bottom: 20px;
+  }
+  #nextTargetMessage {
+    font-size: 18px;
+    margin: 20px 0;
+    color: #ff7043;
+    font-weight: bold;
+    border-bottom: 2px solid #ff7043;
+    padding-bottom: 10px;
+  }
+  #dayContainer {
+    margin-top: 20px;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 20px;
+    overflow: hidden;
+  }
+  .dayCircle {
+    flex: 1 1 auto;
+    min-width: 40px;
+    height: 40px;
+    border: 3px solid #e57373;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    color: #fff;
+    background-color: #ff7043;
+    transition: background-color 0.3s ease;
+  }
+  .marked {
+    background-color: #f44336;
+  }
+  .currentDay {
+    background-color: #ffb74d;
+    color: #000;
+  }
+  .markedToday {
+    background-color: #d32f2f;
+  }
+  #clickButton {
+    padding: 10px; 
+    font-size: 14px;
+    background-color: #d32f2f;
+    color: white;
+    border: 1px solid #c62828;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  #clickButton i {
+    margin-right: 5px;
+  }
+  #clickButton:hover {
+    background-color: #c62828;
+  }
+  #copyButton {
+    padding: 10px 20px;
+    font-size: 10px;
+    background-color: #f44336;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    z-index: 9999;
+  }
+  #copyButton:hover {
+    background-color: #c62828;
+  }
+  #countdown {
+    font-size: 24px;
+    margin: 20px 0;
+    color: #d32f2f;
+    font-weight: bold;
+  }
+  #targetList {
+    margin: 20px 0;
+    text-align: left;
+  }
+  .targetItem {
+    margin: 10px 0;
+    padding: 10px;
+    border: 2px solid #e57373;
+    border-radius: 50px;
+    background-color: #fff;
+    position: relative;
+    font-size: 18px;
+    color: #000;
+    font-weight: bold;
+  }
+  .progressBar {
+    width: 100%;
+    background-color: #f1f1f1;
+    border-radius: 10px;
+    height: 20px;
+    margin: 10px 0;
+    position: relative;
+  }
+  .progress {
+    height: 100%;
+    background-color: #ff7043;
+    border-radius: 10px;
+    text-align: center;
+    color: #fff;
+    font-weight: bold;
+  }
+  .completed {
+    background-color: #4caf50;
+  }
+  .tickIcon {
+    position: absolute;
+    right: 10px;
+    top: 10px;
+    color: #388e3c;
+    font-size: 30px;
+    display: none;
+  }
+  .completed .tickIcon {
+    display: block;
+  }
+  .modal {
+    display: none;
+    position: fixed;
+    z-index: 999;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    background-color: white;
+    padding: 20px;
+    border: 1px solid #ccc;
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.5);
+    border-radius: 10px;
+  }
+  .modal-content {
+    margin-bottom: 20px;
+  }
+  .modal input {
+    padding: 10px;
+    width: 80%;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+  }
+  .modal button {
+    padding: 10px 20px;
+    font-size: 16px;
+    background-color: #f44336;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  .modal button:hover {
+    background-color: #c62828;
+  }
+  .close {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    font-size: 24px;
+    cursor: pointer;
+  }
+</style>
+</head>
+<body>
+<div id="container">
+  <button id="copyButton"><i class="fas fa-copy"></i> Copy</button>
+  <h1>Maintain Consistency</h1>
+  <div id="currentDate"></div>
+  <div id="streak">Streak: <span id="streakCount">0</span></div>
+  <div id="message"></div>
+  <div id="nextTargetMessage"></div>
+  <div id="countdown"></div>
+  <div id="dayContainer"></div>
+  <button id="clickButton"><i class="fas fa-fire" style="color: #ffffff;"></i> Streak</button>
+  <div id="targetList"></div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  let daysOfWeek = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+  let today = new Date();
+  let todayDay = today.getDay();
+  let todayDate = today.toLocaleDateString();
+  let dayContainer = document.getElementById('dayContainer');
+  let targetList = document.getElementById('targetList');
+  let nextTargetMessage = document.getElementById('nextTargetMessage');
+
+  document.getElementById('currentDate').innerText = `Today: ${today.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}`;
+
+  for (let i = 0; i < daysOfWeek.length; i++) {
+    let dayCircle = document.createElement('div');
+    dayCircle.classList.add('dayCircle');
+
+    if (i < todayDay) {
+      dayCircle.innerText = daysOfWeek[i];
+      dayCircle.classList.add('marked');
+    } else if (i === todayDay) {
+      dayCircle.innerText = daysOfWeek[i];
+      dayCircle.classList.add('currentDay');
+    } else {
+      dayCircle.innerText = daysOfWeek[i];
+    }
+
+    if (i === todayDay && localStorage.getItem('lastClickedTimestamp') === todayDate) {
+      dayCircle.classList.add('markedToday');
+    }
+
+    dayContainer.appendChild(dayCircle);
+  }
+
+  let streak = parseInt(localStorage.getItem('streak')) || 0;
+  document.getElementById('streakCount').innerText = streak;
+
+  let lastClickedTimestamp = localStorage.getItem('lastClickedTimestamp');
+  let yesterday = new Date();
+  yesterday.setDate(yesterday.getDate() - 1);
+  let yesterdayDate = yesterday.toLocaleDateString();
+
+  if (lastClickedTimestamp && lastClickedTimestamp === todayDate) {
+    document.getElementById('clickButton').disabled = true;
+    document.getElementById('message').innerText = "You have already completed today's goal!";
+  } else {
+    if (lastClickedTimestamp && lastClickedTimestamp !== yesterdayDate) {
+      streak = 0;
+      localStorage.setItem('streak', streak);
+    }
+    document.getElementById('clickButton').disabled = false;
+  }
+
+  document.getElementById('clickButton').addEventListener('click', function() {
+    streak++;
+    document.getElementById('streakCount').innerText = streak;
+    localStorage.setItem('lastClickedTimestamp', todayDate);
+    localStorage.setItem('streak', streak);
+    document.getElementById('clickButton').disabled = true;
+    document.getElementById('message').innerText = "You have completed today's goal!";
+    updateProgress();
+  });
+
+  function updateProgress() {
+    const targets = [7, 15, 30, 75, 90]; // 3 months is approximately 90 days
+    targetList.innerHTML = '';
+
+    let nextTarget = targets.find(targetDays => streak < targetDays);
+    let nextTargetDays = nextTarget || targets[targets.length - 1];
+
+    targets.forEach(targetDays => {
+      let progress = Math.min(100, (streak / targetDays) * 100);
+      let completed = streak >= targetDays;
+
+      let targetItem = document.createElement('div');
+      targetItem.classList.add('targetItem');
+      if (completed) {
+        targetItem.classList.add('completed');
+      }
+      
+      targetItem.innerHTML = `
+        ${completed ? '<i class="fas fa-check tickIcon"></i>' : ''}
+        Target: ${targetDays} days
+        <div class="progressBar">
+          <div class="progress" style="width: ${progress}%;"></div>
+        </div>
+      `;
+
+      targetList.appendChild(targetItem);
+    });
+
+    updateNextTargetMessage(nextTargetDays);
+  }
+
+  function updateNextTargetMessage(nextTargetDays) {
+    if (nextTargetDays) {
+      let streaksLeft = nextTargetDays - streak;
+      if (streaksLeft > 0) {
+        nextTargetMessage.innerText = `Keep going! ${streaksLeft} streaks left to reach ${nextTargetDays} days target.`;
+      } else {
+        nextTargetMessage.innerText = `Congratulations! You've reached the ${nextTargetDays} days target!`;
+      }
+    }
+  }
+
+  updateProgress();
+
+  document.getElementById('copyButton').addEventListener('click', function() {
+    let streakCount = parseInt(document.getElementById('streakCount').innerText);
+    let copyContent = `My current streak is ${streakCount} days!`;
+    let textarea = document.createElement('textarea');
+    textarea.value = copyContent;
+    textarea.setAttribute('readonly', '');
+    textarea.style.position = 'absolute';
+    textarea.style.left = '-9999px';
+    document.body.appendChild(textarea);
+    textarea.select();
+    document.execCommand('copy');
+    document.body.removeChild(textarea);
+    alert("Content copied to clipboard!");
+  });
+});
+</script>
+</body>
+</html>
