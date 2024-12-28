@@ -370,6 +370,45 @@
     <canvas id="resultsChart"></canvas>
   </div>
   <div class="comparison-container" id="comparisonResults"></div>
+      <script type="module">
+        // Import the necessary Firebase SDKs
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-app.js";
+        import { getAnalytics, logEvent } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-analytics.js";
+
+        // Your web app's Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyAM0Vg860sbXufxrRaxlVsSvBZNJCMkobA",
+            authDomain: "airy-office-403502.firebaseapp.com",
+            projectId: "airy-office-403502",
+            storageBucket: "airy-office-403502.firebasestorage.app",
+            messagingSenderId: "728044030413",
+            appId: "1:728044030413:web:44849b24a9a5a9f8b5dc84",
+            measurementId: "G-E0RH2Q1K1B"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const analytics = getAnalytics(app);
+
+        // Log the initial page view
+        logEvent(analytics, 'page_view');
+
+        // Example: Log a custom view count event with a page name
+        function logCustomViewEvent(pageName) {
+            logEvent(analytics, 'view_count', {
+                page: pageName
+            });
+        }
+
+        // Example: Custom log for a specific page
+        logCustomViewEvent('HomePage');
+
+        // You can log other events as well, like button clicks or other actions
+        // Example:
+        // document.getElementById("myButton").addEventListener("click", () => {
+        //     logEvent(analytics, 'button_click', { button_name: 'myButton' });
+        // });
+    </script>
   <script>
     document.addEventListener("DOMContentLoaded", function() {
       const startBtn = document.getElementById("startBtn");
