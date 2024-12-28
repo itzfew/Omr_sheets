@@ -3,13 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Firebase Analytics Example</title>
+    <title>Firebase Analytics with Live View Counter</title>
     <script type="module">
-        // Import the necessary Firebase SDKs
+        // Import necessary Firebase SDKs
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-app.js";
         import { getAnalytics, logEvent } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-analytics.js";
+        import { getFirestore, doc, setDoc, increment, collection, query, where, orderBy, limit, getDocs, onSnapshot } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js";
 
-        // Your web app's Firebase configuration
+        // Your Firebase configuration
         const firebaseConfig = {
             apiKey: "AIzaSyAM0Vg860sbXufxrRaxlVsSvBZNJCMkobA",
             authDomain: "airy-office-403502.firebaseapp.com",
@@ -23,32 +24,101 @@
         // Initialize Firebase
         const app = initializeApp(firebaseConfig);
         const analytics = getAnalytics(app);
+        const db = getFirestore(app);
 
-        // Log the initial page view
+        // Log the page view in Firebase Analytics
         logEvent(analytics, 'page_view');
 
-        // Example: Log a custom view count event with a page name
-        function logCustomViewEvent(pageName) {
-            logEvent(analytics, 'view_count', {
-                page: pageName
-            });
+        // Reference to the Firestore document that stores the daily view count
+        const viewsCollectionRef = collection(db, "view_counts");
+
+        // Get the current date in YYYY-MM-DD format
+        function getCurrentDate() {
+            const today = new Date();
+            const year = today.getFullYear();
+            const month = String(today.getMonth() + 1).padStart(2, '0');
+            const day = String(today.getDate()).padStart(2, '0');
+            return `${year}-${month}-${day}`;
         }
 
-        // Example: Custom log for a specific page
-        logCustomViewEvent('HomePage');
+        // Function to fetch and update the view count for the current day
+        async function updateDailyViewCount() {
+            const today = getCurrentDate();
+            const docRef = doc(db, "view_counts", today);
 
-        // You can log other events as well, like button clicks or other actions
-        // Example:
-        // document.getElementById("myButton").addEventListener("click", () => {
-        //     logEvent(analytics, 'button_click', { button_name: 'myButton' });
-        // });
+            // Increment the view count for today, create document if doesn't exist
+            await setDoc(docRef, {
+                viewCount: increment(1)
+            }, { merge: true });
+        }
+
+        // Function to get the total view count for the past week
+        async function getWeeklyViewCount() {
+            const today = new Date();
+            const sevenDaysAgo = new Date(today);
+            sevenDaysAgo.setDate(today.getDate() - 7); // Get date 7 days ago
+
+            const startDate = sevenDaysAgo.toISOString().split('T')[0]; // Format as YYYY-MM-DD
+
+            // Query to get the daily counts for the last 7 days
+            const q = query(
+                viewsCollectionRef,
+                where("date", ">=", startDate),
+                orderBy("date"),
+                limit(7)
+            );
+
+            const querySnapshot = await getDocs(q);
+            let totalViews = 0;
+            querySnapshot.forEach((doc) => {
+                totalViews += doc.data().viewCount;
+            });
+            return totalViews;
+        }
+
+        // Function to update the displayed view count on the page
+        async function displayViewCounts() {
+            // Display the current day's view count
+            const today = getCurrentDate();
+            const docRef = doc(db, "view_counts", today);
+            const docSnap = await getDoc(docRef);
+            const todayCount = docSnap.exists() ? docSnap.data().viewCount : 0;
+
+            document.getElementById("dailyViewCount").innerText = `Today's views: ${todayCount}`;
+
+            // Display the weekly total view count
+            const weeklyTotal = await getWeeklyViewCount();
+            document.getElementById("weeklyViewCount").innerText = `Total views in the last 7 days: ${weeklyTotal}`;
+        }
+
+        // Update the daily view count on page load
+        updateDailyViewCount().then(() => {
+            // After updating, display the counts
+            displayViewCounts();
+        });
+
+        // Real-time listeners to update the displayed daily count
+        const dailyDocRef = doc(db, "view_counts", getCurrentDate());
+        onSnapshot(dailyDocRef, (docSnapshot) => {
+            const currentCount = docSnapshot.exists() ? docSnapshot.data().viewCount : 0;
+            document.getElementById("dailyViewCount").innerText = `Today's views: ${currentCount}`;
+        });
+
+        // Real-time listener for weekly total view count
+        const weeklyDocRef = collection(db, "view_counts");
+        onSnapshot(weeklyDocRef, () => {
+            getWeeklyViewCount().then(weeklyTotal => {
+                document.getElementById("weeklyViewCount").innerText = `Total views in the last 7 days: ${weeklyTotal}`;
+            });
+        });
     </script>
 </head>
 <body>
     <h1>Welcome to the Website</h1>
-    <p>This website tracks page views using Firebase Analytics.</p>
+    <p>This website tracks page views using Firebase Analytics and Firestore.</p>
 
-    <!-- Optional: Add some buttons or interactions to track custom events -->
-    <!-- <button id="myButton">Click Me!</button> -->
+    <!-- Display the view counts -->
+    <div id="dailyViewCount">Loading today's view count...</div>
+    <div id="weeklyViewCount">Loading weekly view count...</div>
 </body>
 </html>
