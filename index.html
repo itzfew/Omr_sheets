@@ -5,26 +5,53 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>OMR Checking</title>
   <link rel="stylesheet" type="text/css" href="css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
-    
-button#avgScoreBtn.avg-score-btn {
-  background-color: #4CAF50; /* Green background */
-  border: none; /* Remove borders */
-  color: white; /* White text */
-  padding: 15px 32px; /* Some padding */
-  text-align: center; /* Center the text */
-  text-decoration: none; /* Remove underline */
-  display: inline-block; /* Make the button inline-block */
-  font-size: 16px; /* Increase font size */
-  margin: 4px 2px; /* Some margin */
-  cursor: pointer; /* Pointer/hand icon */
-  border-radius: 12px; /* Rounded corners */
+  /* Styling the button */
+.button.avg-score-btn {
+    padding: 12px 28px; /* More space inside the button */
+    font-size: 18px; /* Large text for readability */
+    font-weight: bold;  
+    background: linear-gradient(145deg, #007bff, #0056b3); /* Gradient for 3D effect */
+    color: white; /* White text */
+    border: none; /* No border */
+    border-radius: 10px; /* Smooth rounded corners */
+    cursor: pointer; /* Pointer cursor on hover */
+    transition: all 0.2s ease-in-out; /* Smooth transition */
+    box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.3), 
+                inset -2px -2px 5px rgba(255, 255, 255, 0.2); /* 3D Shadow effect */
+    display: flex; /* Flexbox for icon and text alignment */
+    align-items: center; /* Center items vertically */
+    justify-content: center; /* Center items horizontally */
+    gap: 10px; /* Space between icon and text */
+    text-align: center;
+    min-width: 220px; /* Ensures text fits properly */
 }
 
-button#avgScoreBtn.avg-score-btn:hover {
-  background-color: #45a049; /* Darker green on hover */
-}   
+/* Hover effect */
+.button.avg-score-btn:hover {
+    background: linear-gradient(145deg, #0056b3, #003f80); /* Darker 3D effect */
+    transform: translateY(-2px); /* Slight lift effect */
+    box-shadow: 6px 6px 12px rgba(0, 0, 0, 0.4);
+}
+
+/* Active (Clicked) Effect */
+.button.avg-score-btn:active {
+    background: linear-gradient(145deg, #004080, #002c60);
+    transform: translateY(2px); /* Pressed effect */
+    box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .button.avg-score-btn {
+        padding: 10px 24px;
+        font-size: 16px;
+        min-width: 200px;
+    }
+}
+
     .modal {
   display: flex;
   justify-content: center;
@@ -99,8 +126,9 @@ button#avgScoreBtn.avg-score-btn:hover {
   <a href="https://omrsheets.pages.dev/js/VID_20250403_232955_569.mp4" target="_blank">  🚀 How to use this site?  
 <b>Watch Now<b></b></a>  
 </div>
-<button id="avgScoreBtn" class="button avg-score-btn">Calculate Final Exam Score</button>
-
+<button id="avgScoreBtn" class="button avg-score-btn">
+    <i class="fa fa-bullseye"></i> Calculate Average Score
+</button>
   <h3>OMR Checking</h3>
   <label for="testName">Test Name:</label>
   <input type="text" id="testName" class="input" placeholder="Enter test name">
