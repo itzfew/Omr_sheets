@@ -601,50 +601,51 @@ function displayStoredResults(exam) {
       }
 
       displayExamList();
+ 
       const avgScoreBtn = document.getElementById("avgScoreBtn");
 
-avgScoreBtn.addEventListener("click", function() {
-  const exams = JSON.parse(localStorage.getItem('exams')) || [];
-  if (exams.length === 0) {
-    alert("No exams available to calculate the average score.");
-    return;
-  }
-  const totalScore = exams.reduce((sum, exam) => sum + exam.score, 0);
-  const totalMaxScore = exams.reduce((sum, exam) => sum + exam.maxScore, 0);
-  const avgScore = totalScore / exams.length;
-  const avgPercentage = (totalScore / totalMaxScore) * 100;
-  
-  const message = `
-    <p><strong>Total Exams Attempted:</strong> ${exams.length}</p>
-    <p><strong>Average Score:</strong> ${avgScore.toFixed(2)}</p>
-    <p><strong>Average Percentage:</strong> ${avgPercentage.toFixed(2)}%</p>
-  `;
-  showModal(message);
-});
+      avgScoreBtn.addEventListener("click", function() {
+        const exams = JSON.parse(localStorage.getItem('exams')) || [];
+        if (exams.length === 0) {
+          alert("No exams available to calculate the average score.");
+          return;
+        }
+        const totalScore = exams.reduce((sum, exam) => sum + exam.score, 0);
+        const totalMaxScore = exams.reduce((sum, exam) => sum + exam.maxScore, 0);
+        const avgScore = totalScore / exams.length;
+        const avgPercentage = (totalScore / totalMaxScore) * 100;
+        
+        const message = `
+          <p><strong>Total Exams Attempted:</strong> ${exams.length}</p>
+          <p><strong>Average Score:</strong> ${avgScore.toFixed(2)} (${totalScore}/${totalMaxScore})</p>
+          <p><strong>Average Percentage:</strong> ${avgPercentage.toFixed(2)}%</p>
+        `;
+        showModal(message);
+      });
 
-function showModal(message) {
-  const modal = document.createElement('div');
-  modal.classList.add('modal');
-  modal.innerHTML = `
-    <div class="modal-content">
-      ${message}
-      <span class="modal-close">&times;</span>
-    </div>
-  `;
-  
-  document.body.appendChild(modal);
-  
-  const closeBtn = modal.querySelector('.modal-close');
-  closeBtn.addEventListener('click', () => {
-    modal.remove();
-  });
+      function showModal(message) {
+        const modal = document.createElement('div');
+        modal.classList.add('modal');
+        modal.innerHTML = `
+          <div class="modal-content">
+            ${message}
+            <span class="modal-close">&times;</span>
+          </div>
+        `;
+        
+        document.body.appendChild(modal);
+        
+        const closeBtn = modal.querySelector('.modal-close');
+        closeBtn.addEventListener('click', () => {
+          modal.remove();
+        });
 
-  modal.addEventListener('click', (event) => {
-    if (event.target === modal) {
-      modal.remove();
-    }
-  });
-}
+        modal.addEventListener('click', (event) => {
+          if (event.target === modal) {
+            modal.remove();
+          }
+        });
+      }
       
       // Confirm refresh or page navigation
       window.addEventListener("beforeunload", function(event) {
