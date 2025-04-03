@@ -1,0 +1,339 @@
+
+    body {
+      font-family: Arial, sans-serif;
+      background: #f8f9fa;
+      margin: 0;
+      padding: 20px;
+      max-width: 100%;
+      box-sizing: border-box;
+      overflow: auto;
+    }
+
+    h3 {
+      font-weight: bold;
+      text-align: center;
+      color: #007bff;
+      padding-bottom: 10px;
+      border-bottom: 3px solid #007bff;
+      margin-bottom: 20px;
+    }
+
+    .slide {
+      display: none;
+    }
+
+    .slide p {
+      font-weight: bold;
+      color: #333;
+      text-align: center;
+    }
+
+    .question-container {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
+
+    .question {
+      display: flex;
+      justify-content: flex-start;
+      align-items: center;
+      margin-bottom: 10px;
+      font-weight: bold;
+      color: #333;
+      border-bottom: 2px solid #d70049;
+      flex-wrap: nowrap;
+    }
+
+    .question-number {
+      width: 40px;
+      text-align: center;
+      font-weight: bold;
+      margin-right: 15px;
+    }
+
+    .options-container {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: nowrap;
+      flex-grow: 1;
+      width: 100%;
+    }
+
+    .option-circle {
+      width: 25px;
+      height: 25px;
+      border: 2px solid #d70049;
+      border-radius: 50%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      cursor: pointer;
+      transition: background-color 0.3s, transform 0.3s;
+    }
+
+    .option-circle:hover {
+      background-color: #ddd;
+      transform: scale(1.1);
+    }
+
+    .selected {
+      background-color: #007bff;
+      color: white;
+      transform: scale(1.1);
+    }
+
+    .button {
+      cursor: pointer;
+      background-color: #007bff;
+      box-shadow: 0 0 20px rgba(0, 123, 255, 0.5);
+      border: 2px solid #ddd;
+      width: 150px;
+      height: 40px;
+      border-radius: 10px;
+      color: white;
+      font-size: 16px;
+      transition: transform 0.3s;
+      margin: 10px;
+    }
+
+    .button:hover {
+      transform: scale(1.05);
+    }
+
+    .submit-btn {
+      position: fixed;
+      top: 10px;
+      right: 10px;
+    }
+
+    .result {
+      margin-bottom: 10px;
+      padding: 15px;
+      border-radius: 10px;
+      background-color: #fff;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      transition: transform 0.3s;
+    }
+
+    .result:hover {
+      transform: scale(1.02);
+    }
+
+    .correct {
+      border-left: 5px solid green;
+    }
+
+    .incorrect {
+      border-left: 5px solid red;
+    }
+
+    .missed {
+      border-left: 5px solid #000;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 15px 0;
+      overflow-x: auto;
+      border: 2px solid #007bff; /* Change this color to your desired border color */
+    }
+
+    th, td {
+      border: 2px solid #007bff; /* Change this color to your desired border color */
+      padding: 7px;
+      text-align: left;
+      font-size: 14px;
+    }
+
+    th {
+      background-color: #f2f289;
+      font-weight: bold;
+    }
+
+    .timer {
+      font-size: 18px;
+      font-weight: bold;
+      text-align: center;
+      margin-bottom: 20px;
+      margin-top: 10px;
+      border-bottom: 3px solid #d70049;
+      padding-right: 10px;
+      color: #ff5722;
+    }
+
+    .chart-container {
+      margin: 20px 0;
+      text-align: center;
+    }
+
+    .comparison-container {
+      margin: 20px 0;
+      padding: 15px;
+      background: #fff;
+      border-radius: 10px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      overflow-x: auto;
+    }
+
+    .comparison-container h4 {
+      margin: 0 0 10px;
+      color: #333;
+    }
+
+    .comparison-container p {
+      margin: 5px 0;
+    }
+
+    @media screen and (max-width: 768px) {
+      .question {
+        font-size: 14px;
+      }
+
+      .question-number {
+        width: 35px;
+      }
+
+      .option-circle {
+        width: 22px;
+        height: 22px;
+      }
+
+      .options-container {
+        gap: 5px;
+      }
+
+      .button {
+        font-size: 14px;
+        padding: 12px;
+      }
+
+      .timer {
+        font-size: 16px;
+      }
+
+      .result {
+        padding: 12px;
+      }
+
+      table {
+        font-size: 12px;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+      }
+    }
+
+    @media screen and (max-width: 480px) {
+      .question {
+        font-size: 12px;
+      }
+
+      .question-number {
+        width: 30px;
+      }
+
+      .option-circle {
+        width: 18px;
+        height: 18px;
+      }
+
+      .options-container {
+        gap: 4px;
+      }
+
+      .button {
+        font-size: 12px;
+        padding: 10px;
+      }
+
+      .timer {
+        font-size: 14px;
+      }
+
+      .result {
+        padding: 10px;
+      }
+
+      table {
+        font-size: 12px;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+      }
+    }
+
+    @media screen and (max-width: 400px) {
+      .question {
+        font-size: 10px;
+      }
+
+      .question-number {
+        width: 25px;
+      }
+
+      .option-circle {
+        width: 15px;
+        height: 15px;
+      }
+
+      .options-container {
+        gap: 3px;
+      }
+
+      .button {
+        font-size: 15px;
+        padding: 12px;
+      }
+
+      .timer {
+        font-size: 12px;
+      }
+
+      .result {
+        padding: 8px;
+      }
+
+      table {
+        font-size: 10px;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+      }
+    }
+
+    .input {
+      padding: 12px 20px;
+      font-size: 16px;
+      border-radius: 8px;
+      border: 2px solid #ccc;
+      background-color: #f1f1f1;
+      color: #333;
+      width: 100%;
+      transition: all 0.3s ease;
+      box-sizing: border-box;
+    }
+
+    .input:focus {
+      border-color: #5c6bc0;
+      background-color: #fff;
+      outline: none;
+      box-shadow: 0 0 10px rgba(92, 107, 192, 0.3);
+    }
+
+    .input:active {
+      background-color: #e8e8e8;
+      border-color: #3f51b5;
+    }
+
+    .input:hover {
+      border-color: #3f51b5;
+      background-color: #fff;
+    }
+
+    .input::placeholder {
+      color: #aaa;
+      opacity: 0.7;
+      font-style: italic;
+    }
+  
