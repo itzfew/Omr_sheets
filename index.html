@@ -7,32 +7,53 @@
   <link rel="stylesheet" type="text/css" href="css/style.css">
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
-    .news-header {
-      background-color: #ffcc00;
-      padding: 0px;
-      text-align: center;
-      font-size: 10px;
-      font-weight: bold;
-      border: 2px solid #ff9900;
-      border-radius: 3px;
-      margin: 0px auto;
-      width: 95%;
-    }
-    .news-header a {
-      text-decoration: none;
-      color: #333;
-    }
-    .news-header a:hover {
-      text-decoration: underline;
-    }
-  </style>
+  .news-header {
+    background-color: #d32f2f; /* Red background */
+    color: white;
+    padding: 12px;
+    text-align: center;
+    font-size: 16px;
+    font-weight: bold;
+    border-radius: 5px;
+    position: relative;
+    width: 95%;
+    margin: 10px auto;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2);
+  }
+
+  .news-header a {
+    text-decoration: none;
+    color: white;
+    font-weight: bold;
+  }
+
+  .news-header a:hover {
+    text-decoration: underline;
+  }
+
+  .news-badge {
+    position: absolute;
+    top: -10px;
+    left: -10px;
+    background: yellow;
+    color: black;
+    font-size: 12px;
+    font-weight: bold;
+    padding: 3px 8px;
+    transform: rotate(-15deg);
+    border-radius: 3px;
+    box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.3);
+  }
+</style>
 </head>
 <body>
 
   <div class="news-header">
-    🔥 Latest NEET 2025 Update: 
-    <a href="https://neet.nta.nic.in/" target="_blank">Check Here</a>
-  </div>
+  <div class="news-badge">NEW</div>
+  🚀 Breaking News: Latest NEET 2025 Update!  
+  <a href="https://neet.nta.nic.in/" target="_blank">Check Here</a>  
+</div>
+
 
   <h3>OMR Checking</h3>
   <label for="testName">Test Name:</label>
