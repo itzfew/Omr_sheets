@@ -1,4 +1,4 @@
-
+      <script type="module">
         // Import the necessary Firebase SDKs
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-app.js";
         import { getAnalytics, logEvent } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-analytics.js";
@@ -36,7 +36,8 @@
         // document.getElementById("myButton").addEventListener("click", () => {
         //     logEvent(analytics, 'button_click', { button_name: 'myButton' });
         // });
-    
+    </script>
+  <script>
     document.addEventListener("DOMContentLoaded", function() {
       const startBtn = document.getElementById("startBtn");
       const nextBtn = document.getElementById("nextBtn");
@@ -529,4 +530,4 @@ function displayStoredResults(exam) {
         }
       });
     });
-  
+  </script>
