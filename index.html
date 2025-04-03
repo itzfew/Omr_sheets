@@ -54,7 +54,8 @@
   <a href="https://omrsheets.pages.dev/js/VID_20250403_232955_569.mp4" target="_blank">  🚀 How to use this site?  
 <b>Watch Now<b></b></a>  
 </div>
-
+<h2>Final Exam Score Calculator</h2>
+    <button onclick="calculateFinalScore()">Find Your Final Exam Score</button>
 
   <h3>OMR Checking</h3>
   <label for="testName">Test Name:</label>
@@ -623,5 +624,27 @@ function displayStoredResults(exam) {
       });
     });
   </script>
+
+  <script>
+        function calculateFinalScore() {
+            let scores = JSON.parse(localStorage.getItem('examScores')) || [];
+            if (scores.length === 0) {
+                alert("No exam scores found!");
+                return;
+            }
+            
+            let totalMarks = scores.reduce((sum, exam) => sum + exam.maxMarks, 0);
+            let obtainedMarks = scores.reduce((sum, exam) => sum + exam.obtained, 0);
+            let avgScore = (obtainedMarks / totalMarks) * 100;
+            
+            alert(`Final Score:\nMax Marks: ${totalMarks}\nObtained Marks: ${obtainedMarks}\nAverage: ${avgScore.toFixed(2)}%`);
+        }
+
+        function addExamScore(maxMarks, obtained) {
+            let scores = JSON.parse(localStorage.getItem('examScores')) || [];
+            scores.push({ maxMarks, obtained });
+            localStorage.setItem('examScores', JSON.stringify(scores));
+        }
+    </script>
 </body>
 </html>
