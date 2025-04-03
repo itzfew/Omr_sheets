@@ -520,23 +520,57 @@ function displayStoredResults(exam) {
           maxScore,
           date: new Date().toISOString()
         };
-        const exams = JSON.parse(localStorage.getItem('exams')) || [];
-        exams.push(examData);
-        localStorage.setItem('exams', JSON.stringify(exams));
-        displayExamList();
-      }
 
       function displayExamList() {
-        const exams = JSON.parse(localStorage.getItem('exams')) || [];
-        examList.innerHTML = "";
-        exams.forEach(exam => {
-          const examDiv = document.createElement("div");
-          examDiv.textContent = `${exam.testName} (Taken on ${new Date(exam.date).toLocaleDateString()}) - Score: ${exam.score} / ${exam.maxScore}`;
-          examDiv.classList.add('result');
-          examDiv.style.cursor = 'pointer';
-          examDiv.addEventListener('click', () => displayStoredResults(exam));
-          examList.appendChild(examDiv);
+    const exams = JSON.parse(localStorage.getItem('exams')) || [];
+    examList.innerHTML = ""; // Clear previous list
+
+    exams.forEach((exam, index) => {
+        const examDiv = document.createElement("div");
+        examDiv.classList.add('result');
+        examDiv.style.cursor = 'pointer';
+        examDiv.style.display = 'flex';
+        examDiv.style.alignItems = 'center';
+        examDiv.style.justifyContent = 'space-between';
+        examDiv.style.padding = '10px';
+        examDiv.style.border = '1px solid #ccc';
+        examDiv.style.borderRadius = '5px';
+        examDiv.style.marginBottom = '5px';
+
+        // Exam Details
+        const examText = document.createElement("span");
+        examText.textContent = `${exam.testName} (Taken on ${new Date(exam.date).toLocaleDateString()}) - Score: ${exam.score} / ${exam.maxScore}`;
+        examText.addEventListener('click', () => displayStoredResults(exam)); // Click to view results
+        
+        // Delete Button
+        const deleteBtn = document.createElement("button");
+        deleteBtn.textContent = "🗑️ Delete";
+        deleteBtn.style.marginLeft = "10px";
+        deleteBtn.style.padding = "5px 10px";
+        deleteBtn.style.border = "none";
+        deleteBtn.style.background = "#ff4444";
+        deleteBtn.style.color = "white";
+        deleteBtn.style.borderRadius = "5px";
+        deleteBtn.style.cursor = "pointer";
+        deleteBtn.addEventListener('click', (e) => {
+            e.stopPropagation(); // Prevent click from opening exam results
+            deleteExam(index);
         });
+
+        examDiv.appendChild(examText);
+        examDiv.appendChild(deleteBtn);
+        examList.appendChild(examDiv);
+    });
+}
+
+// Function to delete a specific exam
+function deleteExam(index) {
+    let exams = JSON.parse(localStorage.getItem('exams')) || [];
+    exams.splice(index, 1); // Remove the selected exam
+    localStorage.setItem('exams', JSON.stringify(exams)); // Update localStorage
+    displayExamList(); // Refresh the displayed list
+}
+
         updateChart();
         updateComparison();
       }
