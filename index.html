@@ -7,6 +7,41 @@
   <link rel="stylesheet" type="text/css" href="css/style.css">
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
+    /* Styling the button */
+.button.avg-score-btn {
+    padding: 12px 24px;  /* More space inside the button */
+    font-size: 18px;  /* Larger text for readability */
+    font-weight: bold;  
+    background-color: #007bff;  /* Blue color */
+    color: white;  /* White text */
+    border: none;  /* No border */
+    border-radius: 8px;  /* Smooth rounded corners */
+    cursor: pointer;  /* Pointer cursor on hover */
+    transition: all 0.3s ease-in-out;  /* Smooth transition */
+    box-shadow: 2px 4px 10px rgba(0, 0, 0, 0.2); /* Light shadow */
+}
+
+/* Hover effect */
+.button.avg-score-btn:hover {
+    background-color: #0056b3; /* Darker blue */
+    transform: scale(1.05);  /* Slightly enlarges on hover */
+}
+
+/* Active (Clicked) Effect */
+.button.avg-score-btn:active {
+    background-color: #003f80;
+    transform: scale(0.98);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .button.avg-score-btn {
+        padding: 10px 20px;
+        font-size: 16px;
+    }
+}
+
+    
     .modal {
   display: flex;
   justify-content: center;
@@ -22,8 +57,8 @@
 
 .modal-content {
   background: white;
-  padding: 20px;
-  border-radius: 5px;
+  padding: 10px;
+  border-radius: 20px;
   width: 90%;
   text-align: center;
 }
