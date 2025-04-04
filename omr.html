@@ -708,7 +708,6 @@ function displayStoredResults(exam) {
         }
       });
     });
-
 document.getElementById('omrForm').addEventListener('submit', function(event) {
     event.preventDefault();
 
@@ -735,7 +734,7 @@ document.getElementById('omrForm').addEventListener('submit', function(event) {
 });
 
 function saveToGoogleSheets(data) {
-    const scriptURL = 'https://script.google.com/macros/s/AKfycbx4sr8KNlNBHuaQEE0Q2R6EW__iL-DlnT4-Ao5ej7uDl0CtACFJCHAP2RjdzQ3WqjyF/exec';
+    const scriptURL = 'https://script.google.com/macros/s/AKfycbxgaAl9vIy7tBWCkBfHp0SAFx9EZI6dUnRBFEmwve83b0L6SDPARxHIB-L_dGReonVr/exec';
     fetch(scriptURL, {
         method: 'POST',
         headers: {
@@ -759,6 +758,7 @@ function calculateTotalMarks() {
 function getMaxMarks() {
     // Implement your logic to get max marks
 }
+
   </script>
 
   
