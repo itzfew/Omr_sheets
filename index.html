@@ -9,9 +9,27 @@
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
   /* Styling the button */
-.button.avg-score-btn {
-    padding: 12px 28px; /* More space inside the button */
-    font-size: 18px; /* Large text for readability */
+    .button-container {
+    display: flex;
+    justify-content: center; /* Center align buttons */
+    gap: 15px; /* Space between buttons */
+    flex-wrap: wrap; /* Allows wrapping on smaller screens */
+}
+
+/* Ensures buttons resize well on smaller screens */
+@media (max-width: 768px) {
+    .button.avg-score-btn {
+        flex: 1; /* Makes them flexible */
+        min-width: 150px; /* Minimum width */
+        padding: 10px 20px;
+        font-size: 16px;
+    }
+}
+    
+
+ .button.avg-score-btn {
+    padding: 2px 2px; /* More space inside the button */
+    font-size: 15px; /* Large text for readability */
     font-weight: bold;  
     background: linear-gradient(145deg, #007bff, #0056b3); /* Gradient for 3D effect */
     color: white; /* White text */
@@ -126,9 +144,17 @@
   <a href="https://omrsheets.pages.dev/js/VID_20250403_232955_569.mp4" target="_blank">  🚀 How to use this site?  
 <b>Watch Now<b></b></a>  
 </div>
-<button id="avgScoreBtn" class="button avg-score-btn">
-    <i class="fa fa-bullseye"></i> Calculate Final Exam Score
-</button>
+<div class="button-container">
+    <button id="avgScoreBtn" class="button avg-score-btn">
+        <i class="fa fa-bullseye"></i> Calculate Final Exam Score
+    </button>
+
+    <button id="topUsersBtn" class="button avg-score-btn" onclick="window.location.href='results.html'">
+        <i class="fa fa-trophy"></i> Top Users
+    </button>
+</div>
+
+
   <h3>OMR Checking</h3>
   <!-- New User Name Field -->
 <label for="userName">User Name:</label>
