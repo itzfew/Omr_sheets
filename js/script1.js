@@ -21,6 +21,7 @@
       resultBtn.textContent = "New Exam";
       resultBtn.addEventListener('click', () => {
         document.getElementById("testName").value = '';
+        document.getElementById("userName").value = '';
         document.getElementById("numQuestions").value = 15;
         startBtn.style.display = "block";
         slide1.style.display = "none";
@@ -37,17 +38,17 @@
       });
 
       startBtn.addEventListener("click", function() {
-        const userName = document.getElementById("userName").value.trim(); // Get 
         const testName = document.getElementById("testName").value.trim();
+        const userName = document.getElementById("userName").value.trim();
         const numQuestions = parseInt(document.getElementById("numQuestions").value);
         if (userName === "" || testName === "" || numQuestions <= 0) {
-    alert("Please enter your name, a valid test name, and number of questions.");
-    return;
-  }
-
+          alert("Please enter a valid user name and test name and number of questions.");
+          return;
+        }
         populateSlides(numQuestions);
         startBtn.style.display = "none";
         document.getElementById("testName").style.display = "none";
+        document.getElementById("userName").style.display = "none";
         document.getElementById("numQuestions").style.display = "none";
         nextBtn.style.display = "block";
         slide1.style.display = "block";
@@ -348,25 +349,28 @@ function displayStoredResults(exam) {
     slide3.insertBefore(resultBtn, slide3.firstChild);
 }
 
-      function saveResults(userName, testName, results, score, maxScore ) {
+      function saveResults(testName, results, score, maxScore) {
   const examData = {
     testName,
-    userName,
     results,
     score,
     maxScore,
     date: new Date().toISOString()
   };
 
+  // 1. Save to localStorage
   const exams = JSON.parse(localStorage.getItem('exams')) || [];
   exams.push(examData);
   localStorage.setItem('exams', JSON.stringify(exams));
 
+  // 2. Save to Google Sheet
   saveToGoogleSheet(examData);
+
+  // 3. Refresh exam list
   displayExamList();
 }
 function saveToGoogleSheet(examData) {
-  const scriptURL = "https://script.google.com/macros/s/AKfycbxjn_Q44RvDRtE8FzQ0huagvqQ231TI3CFgd25DIv2tZZM3IgriFUpVqC-G6Nym3Zuk/exec"; // Replace with your Web App URL
+  const scriptURL = "https://script.google.com/macros/s/AKfycbxwHBDIJdV9qvdgkVg7T-WwA9wx7rWcs3vx370YBbDvHuO4vVgqHBKB36jLU05ezLY/exec"; // Replace with your Web App URL
 
   const totalQuestions = examData.results.length;
   const totalCorrect = examData.results.filter(r => r.correct).length;
@@ -374,17 +378,17 @@ function saveToGoogleSheet(examData) {
   const totalMissed = examData.results.filter(r => r.missed).length;
 
   const payload = {
-  userName: examData.userName,   // Add this line
-  testName: examData.testName,
-  score: examData.score,
-  maxScore: examData.maxScore,
-  totalQuestions,
-  totalCorrect,
-  totalWrong,
-  totalMissed,
-  date: examData.date,
-  results: formatResultsString(examData.results)
-};
+    testName: examData.testName,
+    score: examData.score,
+    maxScore: examData.maxScore,
+    totalQuestions,
+    totalCorrect,
+    totalWrong,
+    totalMissed,
+    date: examData.date,
+    results: formatResultsString(examData.results)
+  };
+
   fetch(scriptURL, {
     method: 'POST',
     body: new URLSearchParams(payload)
