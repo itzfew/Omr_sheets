@@ -117,13 +117,14 @@
       const tbody = document.getElementById("resultsBody");
 
       data.forEach(row => {
-        const [date, testName, qNo, correct, wrong, missed, score, maxMarks] = row;
+        const [date, userName, testName, qNo, correct, wrong, missed, score, maxMarks] = row;
         const percentage = ((score / maxMarks) * 100).toFixed(2);
 
         const tr = document.createElement("tr");
 
         tr.innerHTML = `
           <td data-label="Date">${new Date(date).toLocaleDateString()}</td>
+          <td data-label="User Name">${userName}</td>
           <td data-label="Test Name">${testName}</td>
           <td data-label="Score" class="score">${score}</td>
           <td data-label="Max Marks">${maxMarks}</td>
