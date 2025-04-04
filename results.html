@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Test Results</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #f4f4f9;
+      margin: 0;
+      padding: 20px;
+    }
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+      background: #fff;
+      padding: 25px;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+    h1 {
+      text-align: center;
+      color: #333;
+      margin-bottom: 20px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 15px;
+    }
+    th, td {
+      padding: 14px 12px;
+      text-align: left;
+      border-bottom: 1px solid #e0e0e0;
+    }
+    th {
+      background-color: #0066cc;
+      color: white;
+      font-weight: 600;
+    }
+    tr:hover {
+      background-color: #f1f1f1;
+    }
+    @media (max-width: 600px) {
+      table, thead, tbody, th, td, tr {
+        display: block;
+      }
+      tr {
+        margin-bottom: 15px;
+        border-bottom: 2px solid #ddd;
+      }
+      td {
+        text-align: right;
+        padding-left: 50%;
+        position: relative;
+      }
+      td::before {
+        content: attr(data-label);
+        position: absolute;
+        left: 12px;
+        width: 45%;
+        padding-right: 10px;
+        text-align: left;
+        font-weight: bold;
+      }
+      th {
+        display: none;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Test Results</h1>
+    <table id="testTable">
+      <thead>
+        <tr>
+          <th>Test Name</th>
+          <th>Date</th>
+          <th>Score</th>
+          <th>Percentage</th>
+        </tr>
+      </thead>
+      <tbody>
+        <!-- Data will be inserted here -->
+      </tbody>
+    </table>
+  </div>
+
+  <script>
+    const sheetUrl = 'YOUR_PUBLISHED_CSV_LINK_HERE';
+
+    async function fetchData() {
+      try {
+        const response = await fetch(sheetUrl);
+        const data = await response.text();
+        const rows = data.split('\\n').slice(1); // Skip header row
+        const tableBody = document.querySelector('#testTable tbody');
+
+        rows.forEach(row => {
+          const cols = row.split(',');
+          if (cols.length < 4) return; // Skip incomplete rows
+
+          const [testName, date, score, maxMarks] = cols;
+          const percentage = ((parseInt(score) / parseInt(maxMarks)) * 100).toFixed(2);
+
+          const tr = document.createElement('tr');
+
+          const nameCell = document.createElement('td');
+          nameCell.textContent = testName;
+          nameCell.setAttribute('data-label', 'Test Name');
+
+          const dateCell = document.createElement('td');
+          dateCell.textContent = new Date(date).toLocaleDateString();
+          dateCell.setAttribute('data-label', 'Date');
+
+          const scoreCell = document.createElement('td');
+          scoreCell.textContent = `${score} / ${maxMarks}`;
+          scoreCell.setAttribute('data-label', 'Score');
+
+          const percentageCell = document.createElement('td');
+          percentageCell.textContent = `${percentage}%`;
+          percentageCell.setAttribute('data-label', 'Percentage');
+
+          tr.appendChild(nameCell);
+          tr.appendChild(dateCell);
+          tr.appendChild(scoreCell);
+          tr.appendChild(percentageCell);
+
+          tableBody.appendChild(tr);
+        });
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', fetchData);
+  </script>
+</body>
+</html>
