@@ -33,10 +33,14 @@
       background: rgba(255, 255, 255, 0.2);
       border-radius: 5px;
     }
+    .table-container {
+      margin-top: 50px;
+      padding: 10px;
+      overflow-x: auto;
+    }
     table {
       width: 100%;
       border-collapse: collapse;
-      margin-top: 50px;
       white-space: nowrap;
     }
     th, td {
@@ -50,6 +54,7 @@
     }
     td {
       border-bottom: 1px solid #ddd;
+      cursor: pointer;
     }
     tr:hover {
       background-color: #f1f1f1;
@@ -62,9 +67,36 @@
       font-weight: bold;
       color: #28a745;
     }
-    .table-container {
-      overflow-x: auto;
-      padding: 10px;
+    /* Full-Screen Detail View */
+    .fullscreen {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.8);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      color: white;
+      text-align: center;
+      padding: 20px;
+    }
+    .fullscreen h2 {
+      margin-bottom: 10px;
+    }
+    .fullscreen p {
+      font-size: 18px;
+      margin: 5px 0;
+    }
+    .close-btn {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      font-size: 24px;
+      cursor: pointer;
+      color: white;
     }
     @media (max-width: 600px) {
       table {
@@ -80,18 +112,20 @@
   <nav>
     <a href="index.html"><i class="fa fa-home"></i> Home</a>
     <a href="streaks.html"><i class="fa fa-fire"></i> Streaks</a>
+    <a href="leaderboard.html"><i class="fa fa-trophy"></i> Leaderboard</a>
   </nav>
 
   <div class="table-container">
     <table>
       <thead>
         <tr>
-          <th>Date</th>
-          <th>User</th>
-          <th>Test Name</th>
-          <th>Score</th>
-          <th>Max Marks</th>
-          <th>Percentage</th>
+          <th>S.No.</th>
+          <th>Date <i class="fa fa-calendar"></i></th>
+          <th>User <i class="fa fa-user"></i></th>
+          <th>Test Name <i class="fa fa-file-alt"></i></th>
+          <th>Score <i class="fa fa-check-circle"></i></th>
+          <th>Max Marks <i class="fa fa-star"></i></th>
+          <th>Percentage <i class="fa fa-chart-line"></i></th>
         </tr>
       </thead>
       <tbody id="resultsBody">
@@ -100,25 +134,44 @@
     </table>
   </div>
 
+  <!-- Full-Screen Details View -->
+  <div id="fullscreenView" class="fullscreen">
+    <span class="close-btn" onclick="closeFullscreen()"><i class="fa fa-arrow-left"></i> Back</span>
+    <h2 id="fsTestName"></h2>
+    <p><b>Date:</b> <span id="fsDate"></span></p>
+    <p><b>User:</b> <span id="fsUser"></span></p>
+    <p><b>Score:</b> <span id="fsScore"></span> / <span id="fsMaxMarks"></span></p>
+    <p><b>Percentage:</b> <span id="fsPercentage"></span>%</p>
+    <p><b>Total Questions:</b> <span id="fsTotalQuestions"></span></p>
+    <p><b>Correct:</b> <span id="fsCorrect"></span></p>
+    <p><b>Wrong:</b> <span id="fsWrong"></span></p>
+    <p><b>Missed:</b> <span id="fsMissed"></span></p>
+  </div>
+
   <script>
     const sheetCSV = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRNO6w5PTX-COn1RWgJy4wassEiqUXfRX8F3ULTPEuwoco32xibia37QQ11L3_hIhjaGTycUX832fHO/pub?gid=0&single=true&output=csv";
 
     async function fetchSheet() {
       const res = await fetch(sheetCSV);
       const text = await res.text();
-      const rows = text.trim().split("\n").slice(1);
-      const data = rows.map(row => row.split(","));
+      const rows = text.trim().split("\n").slice(1); // Skip header
+      let data = rows.map(row => row.split(","));
 
+      // Sort by date (latest first)
       data.sort((a, b) => new Date(b[0]) - new Date(a[0]));
+
+      // Limit to the latest 20 entries
+      data = data.slice(0, 20);
 
       const tbody = document.getElementById("resultsBody");
 
-      data.forEach(row => {
+      data.forEach((row, index) => {
         const [date, userName, testName, qNo, correct, wrong, missed, score, maxMarks] = row;
         const percentage = ((score / maxMarks) * 100).toFixed(2);
 
         const tr = document.createElement("tr");
         tr.innerHTML = `
+          <td>${index + 1}</td>
           <td>${new Date(date).toLocaleDateString()}</td>
           <td>${userName}</td>
           <td>${testName}</td>
@@ -126,8 +179,28 @@
           <td>${maxMarks}</td>
           <td class="percentage">${percentage}%</td>
         `;
+        tr.addEventListener("click", () => openFullscreen(date, userName, testName, score, maxMarks, percentage, qNo, correct, wrong, missed));
         tbody.appendChild(tr);
       });
+    }
+
+    function openFullscreen(date, userName, testName, score, maxMarks, percentage, qNo, correct, wrong, missed) {
+      document.getElementById("fsTestName").textContent = testName;
+      document.getElementById("fsDate").textContent = new Date(date).toLocaleDateString();
+      document.getElementById("fsUser").textContent = userName;
+      document.getElementById("fsScore").textContent = score;
+      document.getElementById("fsMaxMarks").textContent = maxMarks;
+      document.getElementById("fsPercentage").textContent = percentage;
+      document.getElementById("fsTotalQuestions").textContent = qNo;
+      document.getElementById("fsCorrect").textContent = correct;
+      document.getElementById("fsWrong").textContent = wrong;
+      document.getElementById("fsMissed").textContent = missed;
+
+      document.getElementById("fullscreenView").style.display = "flex";
+    }
+
+    function closeFullscreen() {
+      document.getElementById("fullscreenView").style.display = "none";
     }
 
     fetchSheet();
