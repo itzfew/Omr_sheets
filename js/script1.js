@@ -84,8 +84,9 @@
         const results = matchAnswers(answers1, answers2);
         const { score, maxScore } = calculateScore(results);
         const testName = document.getElementById("testName").value.trim();
-        displayResults(results, testName, score, maxScore);
-        saveResults(testName, results, score, maxScore);
+        const userName = document.getElementById("userName").value.trim();
+        displayResults(results, userName, testName, score, maxScore);
+        saveResults(userName, testName, results, score, maxScore);
         submitBtn.style.display = "none";
         prevBtn.style.display = "none";
         resultBtn.style.display = "block";
@@ -227,8 +228,8 @@
         return { score, maxScore };
       }
 
-      function displayResults(results, testName, score, maxScore) {
-    slide3.innerHTML = `<h3>Results for ${testName}</h3><p>Score: ${score} / ${maxScore}</p>`;
+      function displayResults(results,userName, testName, score, maxScore) {
+    slide3.innerHTML = `<h3>Dear ${userName} Results for ${testName}</h3><p>Score: ${score} / ${maxScore}</p>`;
     
     const table = document.createElement('table');
     const thead = document.createElement('thead');
@@ -289,7 +290,7 @@
 }
 
 function displayStoredResults(exam) {
-    slide3.innerHTML = `<h3>Results for ${exam.testName}</h3><p>Score: ${exam.score} / ${exam.maxScore}</p>`;
+    slide3.innerHTML = `<h3>Dear ${exam.userName} Results for ${exam.testName}</h3><p>Score: ${exam.score} / ${exam.maxScore}</p>`;
     
     const table = document.createElement('table');
     const thead = document.createElement('thead');
@@ -349,8 +350,9 @@ function displayStoredResults(exam) {
     slide3.insertBefore(resultBtn, slide3.firstChild);
 }
 
-      function saveResults(testName, results, score, maxScore) {
+      function saveResults(userName, testName, results, score, maxScore) {
   const examData = {
+    userName,
     testName,
     results,
     score,
@@ -378,6 +380,7 @@ function saveToGoogleSheet(examData) {
   const totalMissed = examData.results.filter(r => r.missed).length;
 
   const payload = {
+    userName: examData.userName,
     testName: examData.testName,
     score: examData.score,
     maxScore: examData.maxScore,
