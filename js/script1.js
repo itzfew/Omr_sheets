@@ -37,8 +37,7 @@
       });
 
       startBtn.addEventListener("click", function() {
-        const userName = document.getElementById("userName").value.trim(); // Get name
-saveResults(testName, results, score, maxScore, userName);         // Pass name
+        const userName = document.getElementById("userName").value.trim(); // Get 
         const testName = document.getElementById("testName").value.trim();
         const numQuestions = parseInt(document.getElementById("numQuestions").value);
         if (userName === "" || testName === "" || numQuestions <= 0) {
