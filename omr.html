@@ -151,7 +151,7 @@
   <button id="nextBtn" class="button next-btn" style="display:none">Next</button>
   <button id="prevBtn" class="button prev-btn" style="display:none">Previous</button>
   <button id="submitBtn" class="button submit-btn" style="display:none">Submit</button>
-  </form>
+  
   <div id="slide2" class="slide">
     <p>Choose correct answers for respective questions:</p>
     <div class="question-container"></div>
@@ -165,7 +165,7 @@
     <canvas id="resultsChart"></canvas>
   </div>
 
-  <div class="comparison-container" id="comparisonResults"></div>
+  <div class="comparison-container" id="comparisonResults"></div></form>
   <script>
     document.addEventListener("DOMContentLoaded", function() {
       const startBtn = document.getElementById("startBtn");
@@ -709,32 +709,33 @@ function displayStoredResults(exam) {
       });
     });
 
-    document.getElementById('omrForm').addEventListener('submit', function(event) {
+document.getElementById('omrForm').addEventListener('submit', function(event) {
     event.preventDefault();
 
     const username = document.getElementById('username').value;
+    const testName = document.getElementById('testName').value.trim();
+    const numQuestions = parseInt(document.getElementById('numQuestions').value);
+
     const totalMarks = calculateTotalMarks(); // Replace with your function to calculate total marks
     const maxMarks = getMaxMarks(); // Replace with your function to get max marks
     const percentage = (totalMarks / maxMarks) * 100;
-    const testName = getTestName(); // Replace with your function to get test name
-    const totalQuestions = getTotalQuestions(); // Replace with your function to get total questions
     const date = new Date().toISOString();
 
     const data = {
         username: username,
-        totalMarks: totalMarks,
-        percentage: percentage.toFixed(2),
-        maxMarks: maxMarks,
-        date: date,
         testName: testName,
-        totalQuestions: totalQuestions
+        numQuestions: numQuestions,
+        totalMarks: totalMarks,
+        maxMarks: maxMarks,
+        percentage: percentage.toFixed(2),
+        date: date
     };
 
     saveToGoogleSheets(data);
 });
 
 function saveToGoogleSheets(data) {
-    const scriptURL = 'YOUR_GOOGLE_SHEETS_SCRIPT_URL';
+    const scriptURL = 'https://script.google.com/macros/s/AKfycbx4sr8KNlNBHuaQEE0Q2R6EW__iL-DlnT4-Ao5ej7uDl0CtACFJCHAP2RjdzQ3WqjyF/exec';
     fetch(scriptURL, {
         method: 'POST',
         headers: {
@@ -757,14 +758,6 @@ function calculateTotalMarks() {
 
 function getMaxMarks() {
     // Implement your logic to get max marks
-}
-
-function getTestName() {
-    // Implement your logic to get test name
-}
-
-function getTotalQuestions() {
-    // Implement your logic to get total questions
 }
   </script>
 
