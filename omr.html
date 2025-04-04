@@ -513,18 +513,36 @@ function displayStoredResults(exam) {
 }
 
       function saveResults(testName, results, score, maxScore) {
-        const examData = {
-          testName,
-          results,
-          score,
-          maxScore,
-          date: new Date().toISOString()
-        };
-        const exams = JSON.parse(localStorage.getItem('exams')) || [];
-        exams.push(examData);
-        localStorage.setItem('exams', JSON.stringify(exams));
-        displayExamList();
-      }
+  const percentage = ((score / maxScore) * 100).toFixed(2);
+
+  const examData = {
+    testName,
+    results,
+    score,
+    maxScore,
+    percentage,
+    date: new Date().toISOString()
+  };
+
+  // Save to local storage (optional)
+  const exams = JSON.parse(localStorage.getItem('exams')) || [];
+  exams.push(examData);
+  localStorage.setItem('exams', JSON.stringify(exams));
+  displayExamList();
+
+  // Send to Google Sheet
+  fetch("https://script.google.com/macros/s/AKfycbwvqaY57AFnNs_uzuDxH30NqOqauO8pex2QbSW8M6hVojrCD9vMnavrZn5vrkkA5vij/exec", {
+    method: "POST",
+    body: JSON.stringify(examData),
+    headers: {
+      "Content-Type": "application/json"
+    }
+  })
+    .then(response => response.text())
+    .then(data => console.log("Sheet saved:", data))
+    .catch(error => console.error("Error saving to Sheet:", error));
+}
+
 
       function displayExamList() {
         const exams = JSON.parse(localStorage.getItem('exams')) || [];
