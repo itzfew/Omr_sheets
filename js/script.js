@@ -347,36 +347,44 @@ function displayStoredResults(exam) {
 }
 
       function saveResults(testName, results, score, maxScore) {
-    const examData = {
-        testName,
-        results,
-        score,
-        maxScore,
-        date: new Date().toISOString()
-    };
-    const exams = JSON.parse(localStorage.getItem('exams')) || [];
-    exams.push(examData);
-    localStorage.setItem('exams', JSON.stringify(exams));
-    displayExamList();
-    
-    // Save to Google Sheets
-    const scriptURL = 'https://script.google.com/macros/s/AKfycbwXR7l_eyivM7wj5lnvZs4AJJVW3JBgbYHynmD2Nhw91mQ-4wKXbJKu4ncFUmyvhm2o/exec'; // Replace with your Google Apps Script URL
-    const formData = new FormData();
-    formData.append('testName', testName);
-    formData.append('score', score);
-    formData.append('maxScore', maxScore);
-    formData.append('date', examData.date);
-    
-    // Append each result to the formData
-    results.forEach((result, index) => {
-        formData.append(`question${index + 1}`, JSON.stringify(result));
-    });
-    
-    fetch(scriptURL, { method: 'POST', body: formData })
-        .then(response => response.text())
-        .then(text => console.log('Success!', text))
-        .catch(error => console.error('Error!', error.message));
+  const examData = {
+    testName,
+    results,
+    score,
+    maxScore,
+    date: new Date().toISOString()
+  };
+
+  // 1. Save to localStorage
+  const exams = JSON.parse(localStorage.getItem('exams')) || [];
+  exams.push(examData);
+  localStorage.setItem('exams', JSON.stringify(exams));
+
+  // 2. Save to Google Sheet
+  saveToGoogleSheet(examData);
+
+  // 3. Refresh exam list
+  displayExamList();
 }
+function saveToGoogleSheet(examData) {
+  const scriptURL = "https://script.google.com/macros/s/AKfycbwOf93c1oyQBH1hmo-5dx6Qr3dBpTyVYIufezUWdAN_bP9hsQ-v7y5efEYpk8Emv5Il/exec"; // Replace with your deployed Apps Script Web App URL
+
+  const payload = {
+    testName: examData.testName,
+    score: examData.score,
+    maxScore: examData.maxScore,
+    date: examData.date,
+    results: JSON.stringify(examData.results) // Convert array to string for Sheet
+  };
+
+  fetch(scriptURL, {
+    method: 'POST',
+    body: new URLSearchParams(payload)
+  })
+  .then(response => console.log("Data saved to Google Sheet"))
+  .catch(error => console.error("Error saving to Google Sheet:", error));
+}
+ 
       function displayExamList() {
         const exams = JSON.parse(localStorage.getItem('exams')) || [];
         examList.innerHTML = "";
