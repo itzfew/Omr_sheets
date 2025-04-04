@@ -531,7 +531,7 @@ function displayStoredResults(exam) {
   displayExamList();
 
   // Send to Google Sheet
-  fetch("https://script.google.com/macros/s/AKfycbx-9p5baOhOlduKKitq5HOl3nMOC61CSw33sCVSn3ouXg0wqsrXvZVYg2x7eHuKdrqC/exec", {
+  fetch("https://script.google.com/macros/s/AKfycby15G_Kz9J5hNdbb1C2D1x8KlPFNAShY52jeqX2MFBrMByGrzROXBthYBgrpF7ERvPI/exec", {
   method: "POST",
   headers: {
     "Content-Type": "application/json"
@@ -544,9 +544,8 @@ function displayStoredResults(exam) {
   })
 })
 .then(res => res.text())
-.then(msg => console.log("Saved to Google Sheet:", msg))
-.catch(err => console.error("Error saving:", err));
-
+.then(msg => console.log("Saved to Sheet:", msg))
+.catch(err => console.error("Error saving to Sheet:", err));
 
       function displayExamList() {
         const exams = JSON.parse(localStorage.getItem('exams')) || [];
