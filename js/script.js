@@ -21,6 +21,7 @@
       resultBtn.textContent = "New Exam";
       resultBtn.addEventListener('click', () => {
         document.getElementById("testName").value = '';
+        document.getElementById("userName").value = '';
         document.getElementById("numQuestions").value = 15;
         startBtn.style.display = "block";
         slide1.style.display = "none";
@@ -38,14 +39,16 @@
 
       startBtn.addEventListener("click", function() {
         const testName = document.getElementById("testName").value.trim();
+        const userName = document.getElementById("userName").value.trim();
         const numQuestions = parseInt(document.getElementById("numQuestions").value);
-        if (testName === "" || numQuestions <= 0) {
-          alert("Please enter a valid test name and number of questions.");
+        if (userName === "" || testName === "" || numQuestions <= 0) {
+          alert("Please enter a valid user name and test name and number of questions.");
           return;
         }
         populateSlides(numQuestions);
         startBtn.style.display = "none";
         document.getElementById("testName").style.display = "none";
+        document.getElementById("userName").style.display = "none";
         document.getElementById("numQuestions").style.display = "none";
         nextBtn.style.display = "block";
         slide1.style.display = "block";
@@ -81,8 +84,9 @@
         const results = matchAnswers(answers1, answers2);
         const { score, maxScore } = calculateScore(results);
         const testName = document.getElementById("testName").value.trim();
-        displayResults(results, testName, score, maxScore);
-        saveResults(testName, results, score, maxScore);
+        const userName = document.getElementById("userName").value.trim();
+        displayResults(results, userName, testName, score, maxScore);
+        saveResults(userName, testName, results, score, maxScore);
         submitBtn.style.display = "none";
         prevBtn.style.display = "none";
         resultBtn.style.display = "block";
@@ -224,8 +228,8 @@
         return { score, maxScore };
       }
 
-      function displayResults(results, testName, score, maxScore) {
-    slide3.innerHTML = `<h3>Results for ${testName}</h3><p>Score: ${score} / ${maxScore}</p>`;
+      function displayResults(results,userName, testName, score, maxScore) {
+    slide3.innerHTML = `<h3>Dear ${userName} Results for ${testName}</h3><p>Score: ${score} / ${maxScore}</p>`;
     
     const table = document.createElement('table');
     const thead = document.createElement('thead');
@@ -286,7 +290,7 @@
 }
 
 function displayStoredResults(exam) {
-    slide3.innerHTML = `<h3>Results for ${exam.testName}</h3><p>Score: ${exam.score} / ${exam.maxScore}</p>`;
+    slide3.innerHTML = `<h3>Dear ${exam.userName} Results for ${exam.testName}</h3><p>Score: ${exam.score} / ${exam.maxScore}</p>`;
     
     const table = document.createElement('table');
     const thead = document.createElement('thead');
@@ -346,8 +350,9 @@ function displayStoredResults(exam) {
     slide3.insertBefore(resultBtn, slide3.firstChild);
 }
 
-      function saveResults(testName, results, score, maxScore) {
+      function saveResults(userName, testName, results, score, maxScore) {
   const examData = {
+    userName,
     testName,
     results,
     score,
@@ -367,7 +372,7 @@ function displayStoredResults(exam) {
   displayExamList();
 }
 function saveToGoogleSheet(examData) {
-  const scriptURL = "https://script.google.com/macros/s/AKfycbxwHBDIJdV9qvdgkVg7T-WwA9wx7rWcs3vx370YBbDvHuO4vVgqHBKB36jLU05ezLY/exec"; // Replace with your Web App URL
+  const scriptURL = "https://script.google.com/macros/s/AKfycbyaxQ6loJbHO3sorO3UvwTuT-CtTj-03B4pq15K95jMA30VyUFucEKa9H8CMQ6QrO1a/exec"; // Replace with your Web App URL
 
   const totalQuestions = examData.results.length;
   const totalCorrect = examData.results.filter(r => r.correct).length;
@@ -375,6 +380,7 @@ function saveToGoogleSheet(examData) {
   const totalMissed = examData.results.filter(r => r.missed).length;
 
   const payload = {
+    userName: examData.userName,
     testName: examData.testName,
     score: examData.score,
     maxScore: examData.maxScore,
