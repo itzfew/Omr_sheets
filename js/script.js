@@ -367,15 +367,23 @@ function displayStoredResults(exam) {
   displayExamList();
 }
 function saveToGoogleSheet(examData) {
-  const scriptURL = "https://script.google.com/macros/s/AKfycbwOf93c1oyQBH1hmo-5dx6Qr3dBpTyVYIufezUWdAN_bP9hsQ-v7y5efEYpk8Emv5Il/exec"; // Replace with your deployed Apps Script Web App URL
+  const scriptURL = "https://script.google.com/macros/s/AKfycbxwHBDIJdV9qvdgkVg7T-WwA9wx7rWcs3vx370YBbDvHuO4vVgqHBKB36jLU05ezLY/exec"; // Replace with your Web App URL
+
+  const totalQuestions = examData.results.length;
+  const totalCorrect = examData.results.filter(r => r.correct).length;
+  const totalWrong = examData.results.filter(r => !r.correct && !r.missed).length;
+  const totalMissed = examData.results.filter(r => r.missed).length;
 
   const payload = {
     testName: examData.testName,
     score: examData.score,
     maxScore: examData.maxScore,
+    totalQuestions,
+    totalCorrect,
+    totalWrong,
+    totalMissed,
     date: examData.date,
     results: formatResultsString(examData.results)
- // Convert array to string for Sheet
   };
 
   fetch(scriptURL, {
@@ -385,6 +393,7 @@ function saveToGoogleSheet(examData) {
   .then(response => console.log("Data saved to Google Sheet"))
   .catch(error => console.error("Error saving to Google Sheet:", error));
 }
+
  function formatResultsString(results) {
   return results.map((res, index) => {
     const qNum = index + 1;
@@ -393,6 +402,7 @@ function saveToGoogleSheet(examData) {
     return `${qNum}:${selected}|${correct}`;
   }).join(';');
 }
+
 
       function displayExamList() {
         const exams = JSON.parse(localStorage.getItem('exams')) || [];
