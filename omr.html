@@ -129,14 +129,11 @@
 <button id="avgScoreBtn" class="button avg-score-btn">
     <i class="fa fa-bullseye"></i> Calculate Final Exam Score
 </button>
-  <form id="omrForm">
   <h3>OMR Checking</h3>
   <label for="testName">Test Name:</label>
   <input type="text" id="testName" class="input" placeholder="Enter test name">
   <label for="numQuestions">Number of Questions:</label>
   <input type="number" id="numQuestions" min="1" max="200" value="15" class="input">
-  <label for="username">Username:</label>
-        <input type="text" id="username" name="username" required>
   <button id="startBtn" class="button start-btn">Start Quiz</button>
 
   <div id="timer" class="timer" style="display:none;">
@@ -151,7 +148,7 @@
   <button id="nextBtn" class="button next-btn" style="display:none">Next</button>
   <button id="prevBtn" class="button prev-btn" style="display:none">Previous</button>
   <button id="submitBtn" class="button submit-btn" style="display:none">Submit</button>
-  
+
   <div id="slide2" class="slide">
     <p>Choose correct answers for respective questions:</p>
     <div class="question-container"></div>
@@ -165,7 +162,7 @@
     <canvas id="resultsChart"></canvas>
   </div>
 
-  <div class="comparison-container" id="comparisonResults"></div></form>
+  <div class="comparison-container" id="comparisonResults"></div>
   <script>
     document.addEventListener("DOMContentLoaded", function() {
       const startBtn = document.getElementById("startBtn");
@@ -708,57 +705,6 @@ function displayStoredResults(exam) {
         }
       });
     });
-document.getElementById('omrForm').addEventListener('submit', function(event) {
-    event.preventDefault();
-
-    const username = document.getElementById('username').value;
-    const testName = document.getElementById('testName').value.trim();
-    const numQuestions = parseInt(document.getElementById('numQuestions').value);
-
-    const totalMarks = calculateTotalMarks(); // Replace with your function to calculate total marks
-    const maxMarks = getMaxMarks(); // Replace with your function to get max marks
-    const percentage = (totalMarks / maxMarks) * 100;
-    const date = new Date().toISOString();
-
-    const data = {
-        username: username,
-        testName: testName,
-        numQuestions: numQuestions,
-        totalMarks: totalMarks,
-        maxMarks: maxMarks,
-        percentage: percentage.toFixed(2),
-        date: date
-    };
-
-    saveToGoogleSheets(data);
-});
-
-function saveToGoogleSheets(data) {
-    const scriptURL = 'https://script.google.com/macros/s/AKfycbxF7o3BRLSh2HQyQNU_NbosvLEdofGntPI8AuftGmbKTqfQFGWri9fQp8xotPkjnw/exec';
-    fetch(scriptURL, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(data)
-    })
-    .then(response => response.json())
-    .then(result => {
-        console.log('Success:', result);
-    })
-    .catch(error => {
-        console.error('Error:', error);
-    });
-}
-
-function calculateTotalMarks() {
-    return 160; // Replace with your own logic
-}
-
-function getMaxMarks() {
-    return 180; // Replace with your test's max marks
-}
-
   </script>
 
   
