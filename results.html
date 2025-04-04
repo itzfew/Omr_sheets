@@ -1,43 +1,55 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Test Results</title>
+  <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
   <style>
     body {
       font-family: "Segoe UI", sans-serif;
       background: #f7f9fc;
       margin: 0;
-      padding: 20px;
+      padding: 0;
     }
-    .container {
-      max-width: 960px;
-      margin: auto;
-      background: #fff;
-      padding: 25px;
-      border-radius: 10px;
-      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    nav {
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      background: #007BFF;
+      padding: 10px 0;
+      position: fixed;
+      width: 100%;
+      top: 0;
+      z-index: 1000;
     }
-    h1 {
-      text-align: center;
-      color: #333;
-      margin-bottom: 20px;
+    nav a {
+      color: white;
+      font-size: 18px;
+      text-decoration: none;
+      padding: 10px 15px;
+    }
+    nav a:hover {
+      background: rgba(255, 255, 255, 0.2);
+      border-radius: 5px;
     }
     table {
       width: 100%;
       border-collapse: collapse;
-      margin-top: 10px;
+      margin-top: 50px;
+      white-space: nowrap;
     }
     th, td {
-      padding: 14px;
+      padding: 10px;
       text-align: center;
-      border-bottom: 1px solid #eee;
     }
     th {
       background-color: #007BFF;
       color: white;
       font-weight: 600;
+    }
+    td {
+      border-bottom: 1px solid #ddd;
     }
     tr:hover {
       background-color: #f1f1f1;
@@ -50,47 +62,32 @@
       font-weight: bold;
       color: #28a745;
     }
+    .table-container {
+      overflow-x: auto;
+      padding: 10px;
+    }
     @media (max-width: 600px) {
-      table, thead, tbody, th, td, tr {
+      table {
         display: block;
-      }
-      th {
-        display: none;
-      }
-      tr {
-        margin-bottom: 15px;
-        border: 1px solid #ddd;
-        border-radius: 8px;
-        overflow: hidden;
-      }
-      td {
-        text-align: right;
-        padding-left: 50%;
-        position: relative;
-        border: none;
-        border-bottom: 1px solid #eee;
-      }
-      td::before {
-        content: attr(data-label);
-        position: absolute;
-        left: 10px;
-        width: 45%;
-        padding-left: 10px;
-        font-weight: bold;
-        text-align: left;
-        color: #555;
+        overflow-x: auto;
+        white-space: nowrap;
       }
     }
   </style>
 </head>
 <body>
-  <div class="container">
-    <h1>Test Results Summary</h1>
+
+  <nav>
+    <a href="index.html"><i class="fa fa-home"></i> Home</a>
+    <a href="streaks.html"><i class="fa fa-fire"></i> Streaks</a>
+  </nav>
+
+  <div class="table-container">
     <table>
       <thead>
         <tr>
           <th>Date</th>
-          <th>User Name</th>
+          <th>User</th>
           <th>Test Name</th>
           <th>Score</th>
           <th>Max Marks</th>
@@ -109,10 +106,9 @@
     async function fetchSheet() {
       const res = await fetch(sheetCSV);
       const text = await res.text();
-      const rows = text.trim().split("\n").slice(1); // skip header
+      const rows = text.trim().split("\n").slice(1);
       const data = rows.map(row => row.split(","));
 
-      // Sort by date (latest first)
       data.sort((a, b) => new Date(b[0]) - new Date(a[0]));
 
       const tbody = document.getElementById("resultsBody");
@@ -122,21 +118,20 @@
         const percentage = ((score / maxMarks) * 100).toFixed(2);
 
         const tr = document.createElement("tr");
-
         tr.innerHTML = `
-          <td data-label="Date">${new Date(date).toLocaleDateString()}</td>
-          <td data-label="User Name">${userName}</td>
-          <td data-label="Test Name">${testName}</td>
-          <td data-label="Score" class="score">${score}</td>
-          <td data-label="Max Marks">${maxMarks}</td>
-          <td data-label="Percentage" class="percentage">${percentage}%</td>
+          <td>${new Date(date).toLocaleDateString()}</td>
+          <td>${userName}</td>
+          <td>${testName}</td>
+          <td class="score">${score}</td>
+          <td>${maxMarks}</td>
+          <td class="percentage">${percentage}%</td>
         `;
-
         tbody.appendChild(tr);
       });
     }
 
     fetchSheet();
   </script>
+
 </body>
 </html>
