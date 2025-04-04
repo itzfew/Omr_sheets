@@ -524,27 +524,27 @@ function displayStoredResults(exam) {
     date: new Date().toISOString()
   };
 
-  // Send to Google Sheet
-  fetch("https://script.google.com/macros/s/AKfycby15G_Kz9J5hNdbb1C2D1x8KlPFNAShY52jeqX2MFBrMByGrzROXBthYBgrpF7ERvPI/exec", {
-  method: "POST",
-  headers: {
-    "Content-Type": "application/json"
-  },
-  body: JSON.stringify({
-    testName,
-    score,
-    maxScore,
-    date: new Date().toISOString()
-  })
-})
-.then(res => res.text())
-.then(msg => console.log("Saved to Sheet:", msg))
-.catch(err => console.error("Error saving to Sheet:", err));
-// Save to local storage (optional)
+  // Save to localStorage
   const exams = JSON.parse(localStorage.getItem('exams')) || [];
   exams.push(examData);
   localStorage.setItem('exams', JSON.stringify(exams));
   displayExamList();
+
+  // Send to Google Sheet
+  fetch("https://script.google.com/macros/s/AKfycby15G_Kz9J5hNdbb1C2D1x8KlPFNAShY52jeqX2MFBrMByGrzROXBthYBgrpF7ERvPI/exec", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify(examData)
+  })
+  .then(res => res.text())
+  .then(msg => console.log("Sheet response:", msg))
+  .catch(err => console.error("Error saving to Sheet:", err));
+}
+
+      }
+
       function displayExamList() {
         const exams = JSON.parse(localStorage.getItem('exams')) || [];
         examList.innerHTML = "";
