@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Submit to Google Sheets</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 40px;
+      background: #f0f4f8;
+    }
+    form {
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      max-width: 400px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    input, textarea, button {
+      width: 100%;
+      padding: 10px;
+      margin: 10px 0;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+    }
+    button {
+      background-color: #28a745;
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    .success {
+      color: green;
+    }
+  </style>
+</head>
+<body>
+
+<h2>Submit Your Info</h2>
+
+<form id="dataForm">
+  <input type="text" name="name" placeholder="Your Name" required />
+  <input type="email" name="email" placeholder="Your Email" required />
+  <textarea name="message" placeholder="Your Message" required></textarea>
+  <button type="submit">Submit</button>
+  <p class="success" id="responseMsg"></p>
+</form>
+
+<script>
+  const scriptURL = 'https://script.google.com/macros/s/AKfycbxohp3f4U7E60BUNODRiIpM1XTVUO2bxtcEfCLqRu7jyPW6x4Z_rQvfjZzgF6sI-mmB/exec';
+  const form = document.getElementById('dataForm');
+  const responseMsg = document.getElementById('responseMsg');
+
+  form.addEventListener('submit', e => {
+    e.preventDefault();
+    const formData = new FormData(form);
+    
+    fetch(scriptURL, { method: 'POST', body: formData })
+      .then(response => {
+        responseMsg.textContent = "Submitted successfully!";
+        form.reset();
+      })
+      .catch(error => {
+        responseMsg.textContent = "Error! Try again.";
+        console.error('Error!', error.message);
+      });
+  });
+</script>
+
+</body>
+</html>
