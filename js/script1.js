@@ -372,7 +372,7 @@ function displayStoredResults(exam) {
   displayExamList();
 }
 function saveToGoogleSheet(examData) {
-  const scriptURL = "https://script.google.com/macros/s/AKfycbxwHBDIJdV9qvdgkVg7T-WwA9wx7rWcs3vx370YBbDvHuO4vVgqHBKB36jLU05ezLY/exec"; // Replace with your Web App URL
+  const scriptURL = "https://script.google.com/macros/s/AKfycbyaxQ6loJbHO3sorO3UvwTuT-CtTj-03B4pq15K95jMA30VyUFucEKa9H8CMQ6QrO1a/exec"; // Replace with your Web App URL
 
   const totalQuestions = examData.results.length;
   const totalCorrect = examData.results.filter(r => r.correct).length;
