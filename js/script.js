@@ -374,7 +374,8 @@ function saveToGoogleSheet(examData) {
     score: examData.score,
     maxScore: examData.maxScore,
     date: examData.date,
-    results: JSON.stringify(examData.results) // Convert array to string for Sheet
+    results: formatResultsString(examData.results)
+ // Convert array to string for Sheet
   };
 
   fetch(scriptURL, {
@@ -384,7 +385,15 @@ function saveToGoogleSheet(examData) {
   .then(response => console.log("Data saved to Google Sheet"))
   .catch(error => console.error("Error saving to Google Sheet:", error));
 }
- 
+ function formatResultsString(results) {
+  return results.map((res, index) => {
+    const qNum = index + 1;
+    const selected = res.missed ? "--" : res.selectedOption;
+    const correct = res.correctOption;
+    return `${qNum}:${selected}|${correct}`;
+  }).join(';');
+}
+
       function displayExamList() {
         const exams = JSON.parse(localStorage.getItem('exams')) || [];
         examList.innerHTML = "";
