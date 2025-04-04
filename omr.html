@@ -531,17 +531,21 @@ function displayStoredResults(exam) {
   displayExamList();
 
   // Send to Google Sheet
-  fetch("https://script.google.com/macros/s/AKfycbwvqaY57AFnNs_uzuDxH30NqOqauO8pex2QbSW8M6hVojrCD9vMnavrZn5vrkkA5vij/exec", {
-    method: "POST",
-    body: JSON.stringify(examData),
-    headers: {
-      "Content-Type": "application/json"
-    }
+  fetch("https://script.google.com/macros/s/AKfycbx-9p5baOhOlduKKitq5HOl3nMOC61CSw33sCVSn3ouXg0wqsrXvZVYg2x7eHuKdrqC/exec", {
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json"
+  },
+  body: JSON.stringify({
+    testName,
+    score,
+    maxScore,
+    date: new Date().toISOString()
   })
-    .then(response => response.text())
-    .then(data => console.log("Sheet saved:", data))
-    .catch(error => console.error("Error saving to Sheet:", error));
-}
+})
+.then(res => res.text())
+.then(msg => console.log("Saved to Google Sheet:", msg))
+.catch(err => console.error("Error saving:", err));
 
 
       function displayExamList() {
