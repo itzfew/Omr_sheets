@@ -626,6 +626,7 @@ function saveToGoogleSheet(examData) {
 async function generatePDF(exam) {
   const { jsPDF } = window.jspdf;
   const doc = new jsPDF('p', 'mm', 'a4');
+  const pageHeight = doc.internal.pageSize.height;
   const cellHeight = 10;
   const boxPadding = 2;
   const circleRadius = 3.5;
@@ -641,7 +642,6 @@ async function generatePDF(exam) {
 
   // Legend
   doc.setFontSize(10);
-  doc.setTextColor(0, 0, 0);
   doc.setFont(undefined, 'bold');
   doc.text("Legend:", 10, y);
   drawLegendCircle(doc, 30, y - 2, [0, 128, 0], 'Correct');
@@ -651,6 +651,12 @@ async function generatePDF(exam) {
   y += 10;
 
   for (let i = 0; i < exam.results.length; i += 15) {
+    // Check if space is available for next group of 5 rows (≈50 height)
+    if (y + 5 * cellHeight + 10 > pageHeight) {
+      doc.addPage();
+      y = 10;
+    }
+
     const group = exam.results.slice(i, i + 15);
     const col1 = group.slice(0, 5);
     const col2 = group.slice(5, 10);
@@ -664,7 +670,7 @@ async function generatePDF(exam) {
       y += cellHeight;
     }
 
-    // Draw boxes
+    // Draw surrounding boxes
     doc.setDrawColor(0);
     doc.setLineWidth(0.5);
     doc.rect(10 - boxPadding, startY - boxPadding, 60 + boxPadding * 2, 5 * cellHeight + boxPadding * 2);
@@ -679,6 +685,8 @@ async function generatePDF(exam) {
     doc.setFillColor(...color);
     doc.circle(x, y + 2, circleRadius, 'F');
     doc.setTextColor(0, 0, 0);
+    doc.setFont(undefined, 'normal');
+    doc.setFontSize(10);
     doc.text(label, x + 6, y + 4);
   }
 
@@ -699,7 +707,8 @@ async function generatePDF(exam) {
       const isCorrect = res.correctOption === opt;
       const missed = res.missed;
 
-      let fillColor = [255, 255, 255]; // white default
+      let fillColor = [255, 255, 255]; // white by default
+
       if (missed) {
         if (isCorrect) fillColor = [0, 128, 0];
         else fillColor = [255, 204, 0];
@@ -722,7 +731,8 @@ async function generatePDF(exam) {
       cx += optionGap;
     });
   }
-} 
+}
+ 
     // Confirm refresh or page navigation
       window.addEventListener("beforeunload", function(event) {
         const isExamInProgress = startBtn.style.display === "none"; // Check if exam is ongoing
