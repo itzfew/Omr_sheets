@@ -44,7 +44,7 @@ async function generatePDF(exam) {
 
     const options = ['A', 'B', 'C', 'D'];
     const optionGap = 18;
-    let cx = x + 20;
+    let cx = x + 25; // increased spacing to avoid overlap with box edge
 
     options.forEach(opt => {
       const isSelected = res.selectedOption === opt;
@@ -72,7 +72,7 @@ async function generatePDF(exam) {
       doc.setTextColor(0, 0, 0); // Always black text
       doc.setFontSize(9);
       doc.setFont(undefined, 'bold');
-      doc.text(opt.toLowerCase(), cx - 2.1, y + 5.2);
+      doc.text(opt.toUpperCase(), cx - 2.5, y + 5.2);
 
       cx += optionGap;
     });
