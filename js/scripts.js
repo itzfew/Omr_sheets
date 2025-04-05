@@ -614,80 +614,75 @@ async function generatePDF(exam) {
   doc.text(`Score: ${exam.score} / ${exam.maxScore}`, 10, y);
   y += 10;
 
-  const circled = { A: 'Ⓐ', B: 'Ⓑ', C: 'Ⓒ', D: 'Ⓓ' };
-  const col1 = [], col2 = [];
+  const rows = [];
+  const circleMap = { A: 'Ⓐ', B: 'Ⓑ', C: 'Ⓒ', D: 'Ⓓ' };
 
-  exam.results.forEach((res, index) => {
-    const questionNumber = `Q${index + 1}`;
-    const block = [{ content: questionNumber, styles: { fontStyle: 'bold' } }];
-
-    ['A', 'B', 'C', 'D'].forEach(opt => {
-      const isSelected = res.selectedOption === opt;
-      const isCorrect = res.correctOption === opt;
-
-      let text = circled[opt];
-      let style = 'normal';
-      let color = [0, 0, 0]; // default black
-
-      if (res.missed) {
-        if (isCorrect) {
-          color = [0, 128, 0]; // green
-        }
-      } else if (isSelected && isCorrect) {
-        style = 'bold';
-        color = [0, 128, 0]; // green
-      } else if (isSelected && !isCorrect) {
-        style = 'bold';
-        color = [255, 0, 0]; // red
-      } else if (isCorrect) {
-        style = 'italic';
-        color = [0, 128, 0]; // green
-      }
-
-      block.push({ content: text, styles: { fontStyle: style, textColor: color } });
-    });
-
-    const position = Math.floor(index / 5) % 2 === 0 ? col1 : col2;
-    if (!position[Math.floor(index / 10)]) {
-      position[Math.floor(index / 10)] = [];
-    }
-    position[Math.floor(index / 10)].push(block);
-  });
-
-  // Now render row-wise
-  const finalRows = [];
-  const maxGroups = Math.max(col1.length, col2.length);
-
-  for (let i = 0; i < maxGroups; i++) {
-    const leftBlocks = col1[i] || [];
-    const rightBlocks = col2[i] || [];
+  // Process in groups of 10 (5 left, 5 right)
+  for (let i = 0; i < exam.results.length; i += 10) {
+    const group = exam.results.slice(i, i + 10);
+    const left5 = group.slice(0, 5);
+    const right5 = group.slice(5, 10);
 
     for (let j = 0; j < 5; j++) {
-      const left = leftBlocks[j] || ['', '', '', '', ''];
-      const right = rightBlocks[j] || ['', '', '', '', ''];
-      finalRows.push([...left, '', ...right]);
+      const left = formatQuestionBlock(left5[j], i + j);
+      const right = formatQuestionBlock(right5[j], i + j + 5);
+      rows.push([...left, '', ...right]);
     }
   }
 
   doc.autoTable({
     startY: y,
-    head: [['Q', 'A', 'B', 'C', 'D', '', 'Q', 'A', 'B', 'C', 'D']],
-    body: finalRows,
+    head: [['Q', 'Ⓐ', 'Ⓑ', 'Ⓒ', 'Ⓓ', '', 'Q', 'Ⓐ', 'Ⓑ', 'Ⓒ', 'Ⓓ']],
+    body: rows,
     styles: {
-      fontSize: 10,
       cellPadding: 2,
+      fontSize: 10,
+      valign: 'middle',
     },
     columnStyles: {
-      0: { cellWidth: 10 },
-      5: { cellWidth: 5 },
+      0: { cellWidth: 10 }, 5: { cellWidth: 5 },
       6: { cellWidth: 10 }
     }
   });
 
   doc.save(`${exam.userName}_${exam.testName}_results.pdf`);
+
+  function formatQuestionBlock(res, qIndex) {
+    if (!res) return ['', '', '', '', '']; // filler for empty cells
+
+    const block = [`Q${qIndex + 1}`];
+
+    ['A', 'B', 'C', 'D'].forEach(opt => {
+      const isSelected = res.selectedOption === opt;
+      const isCorrect = res.correctOption === opt;
+
+      let text = circleMap[opt];
+      let style = 'normal';
+      let color = [0, 0, 0];
+
+      if (res.missed) {
+        if (isCorrect) {
+          color = [0, 128, 0]; // Green correct even if missed
+        }
+      } else if (isSelected && isCorrect) {
+        style = 'bold';
+        color = [0, 128, 0]; // Green
+      } else if (isSelected && !isCorrect) {
+        style = 'bold';
+        color = [255, 0, 0]; // Red
+      } else if (isCorrect) {
+        style = 'italic';
+        color = [0, 128, 0]; // Green
+      }
+
+      block.push({ content: text, styles: { textColor: color, fontStyle: style } });
+    });
+
+    return block;
+  }
 }
 
-      // Confirm refresh or page navigation
+    // Confirm refresh or page navigation
       window.addEventListener("beforeunload", function(event) {
         const isExamInProgress = startBtn.style.display === "none"; // Check if exam is ongoing
         if (isExamInProgress) {
