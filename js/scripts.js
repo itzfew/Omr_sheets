@@ -602,93 +602,82 @@ function saveToGoogleSheet(examData) {
         });
       }
 
-function generatePDF(exam) {
-    const { jsPDF } = window.jspdf;
-    const doc = new jsPDF('landscape'); // Landscape for more width
+async function generatePDF(exam) {
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF('p', 'mm', 'a4');
+  let y = 10;
 
-    doc.setFontSize(16);
-    doc.text(`Results for ${exam.userName} - ${exam.testName}`, 14, 15);
-    doc.setFontSize(12);
-    doc.text(`Score: ${exam.score} / ${exam.maxScore}`, 14, 25);
+  doc.setFontSize(14);
+  doc.text(`Results for ${exam.userName} - ${exam.testName}`, 10, y);
+  y += 10;
+  doc.setFontSize(12);
+  doc.text(`Score: ${exam.score} / ${exam.maxScore}`, 10, y);
+  y += 10;
 
-    const body = [];
-    const getColoredCell = (text, selected, correct, missed) => {
-        let styles = { text, fillColor: null, textColor: 20 };
+  const col1 = [], col2 = [];
 
-        if (missed) {
-            styles.fillColor = [0, 0, 0];
-            styles.textColor = [255, 255, 255];
-        } else if (selected && correct) {
-            styles.fillColor = [0, 128, 0]; // Green
-            styles.textColor = [255, 255, 255];
-        } else if (selected && !correct) {
-            styles.fillColor = [255, 0, 0]; // Red
-            styles.textColor = [255, 255, 255];
-        } else if (correct) {
-            styles.fillColor = [0, 128, 0]; // Show correct option green even if not selected
-            styles.textColor = [255, 255, 255];
-        }
-        return styles;
-    };
+  exam.results.forEach((res, index) => {
+    const questionIndex = index + 1;
+    const block = [`Q${questionIndex}`];
+    ['A', 'B', 'C', 'D'].forEach(opt => {
+      const isSelected = res.selectedOption === opt;
+      const isCorrect = res.correctOption === opt;
 
-    const rows = [];
-    for (let i = 0; i < exam.results.length; i += 2) {
-        const row = [];
+      let text = opt;
+      let style = 'normal';
+      let color = [0, 0, 0];
 
-        // Left question
-        const left = exam.results[i];
-        row.push({ content: left.question, styles: { halign: 'center' } });
-        ['A', 'B', 'C', 'D'].forEach(opt => {
-            row.push(getColoredCell(opt,
-                left.selectedOption === opt,
-                left.correctOption === opt,
-                left.missed));
-        });
-
-        // Right question (if exists)
-        if (i + 1 < exam.results.length) {
-            const right = exam.results[i + 1];
-            row.push({ content: right.question, styles: { halign: 'center' } });
-            ['A', 'B', 'C', 'D'].forEach(opt => {
-                row.push(getColoredCell(opt,
-                    right.selectedOption === opt,
-                    right.correctOption === opt,
-                    right.missed));
-            });
+      if (res.missed) {
+        if (isCorrect) {
+          color = [0, 128, 0]; // Green for correct even if missed
         } else {
-            // Fill empty right side if only one question left
-            row.push({ content: '', colSpan: 5 });
+          color = [0, 0, 0]; // Black for missed
         }
+      } else if (isSelected && isCorrect) {
+        style = 'bold';
+        color = [0, 128, 0]; // Green
+      } else if (isSelected && !isCorrect) {
+        style = 'bold';
+        color = [255, 0, 0]; // Red
+      } else if (isCorrect) {
+        style = 'italic';
+        color = [0, 128, 0]; // Green for correct
+      }
 
-        rows.push(row);
-    }
-
-    const headers = [
-        'Q.No', 'A', 'B', 'C', 'D',
-        'Q.No', 'A', 'B', 'C', 'D'
-    ];
-
-    doc.autoTable({
-        head: [headers],
-        body: rows,
-        startY: 35,
-        theme: 'grid',
-        styles: {
-            halign: 'center',
-            valign: 'middle',
-            cellWidth: 'wrap',
-            fontSize: 10,
-            minCellHeight: 10
-        },
-        headStyles: {
-            fillColor: [22, 160, 133],
-            textColor: 255,
-            fontStyle: 'bold'
-        }
+      block.push({ content: text, styles: { textColor: color, fontStyle: style } });
     });
 
-    doc.save(`Result_${exam.testName}_${exam.userName}.pdf`);
+    // Push to left or right column
+    (index % 2 === 0 ? col1 : col2).push(block);
+  });
+
+  // Merge both columns row-wise
+  const finalRows = [];
+  const maxLength = Math.max(col1.length, col2.length);
+  for (let i = 0; i < maxLength; i++) {
+    const left = col1[i] || ['', '', '', '', ''];
+    const right = col2[i] || ['', '', '', '', ''];
+    finalRows.push([...left, '', ...right]);
+  }
+
+  doc.autoTable({
+    startY: y,
+    head: [['Q', 'A', 'B', 'C', 'D', '', 'Q', 'A', 'B', 'C', 'D']],
+    body: finalRows,
+    styles: {
+      cellPadding: 2,
+      fontSize: 10,
+      valign: 'middle',
+    },
+    columnStyles: {
+      0: { cellWidth: 10 }, 5: { cellWidth: 5 },
+      6: { cellWidth: 10 }
+    }
+  });
+
+  doc.save(`${exam.userName}_${exam.testName}_results.pdf`);
 }
+ 
 
       // Confirm refresh or page navigation
       window.addEventListener("beforeunload", function(event) {
