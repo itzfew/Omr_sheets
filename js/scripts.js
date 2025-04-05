@@ -601,9 +601,7 @@ function saveToGoogleSheet(examData) {
           }
         });
       }
-
-
- async function generatePDF(exam) {
+async function generatePDF(exam) {
   const { jsPDF } = window.jspdf;
   const doc = new jsPDF('p', 'mm', 'a4');
   let y = 10;
@@ -616,7 +614,6 @@ function saveToGoogleSheet(examData) {
   y += 10;
 
   const rows = [];
-  const circleMap = { A: 'Ⓐ', B: 'Ⓑ', C: 'Ⓒ', D: 'Ⓓ' };
 
   // Process in groups of 10 (5 left, 5 right)
   for (let i = 0; i < exam.results.length; i += 10) {
@@ -633,7 +630,7 @@ function saveToGoogleSheet(examData) {
 
   doc.autoTable({
     startY: y,
-    head: [['Q', 'Ⓐ', 'Ⓑ', 'Ⓒ', 'Ⓓ', '', 'Q', 'Ⓐ', 'Ⓑ', 'Ⓒ', 'Ⓓ']],
+    head: [['Q', 'a', 'b', 'c', 'd', '', 'Q', 'a', 'b', 'c', 'd']],
     body: rows,
     styles: {
       cellPadding: 2,
@@ -657,23 +654,23 @@ function saveToGoogleSheet(examData) {
       const isSelected = res.selectedOption === opt;
       const isCorrect = res.correctOption === opt;
 
-      let text = circleMap[opt];
+      let text = opt.toLowerCase();
       let style = 'normal';
       let color = [0, 0, 0];
 
       if (res.missed) {
         if (isCorrect) {
-          color = [0, 128, 0]; // Green correct even if missed
+          color = [0, 128, 0]; // green
         }
       } else if (isSelected && isCorrect) {
         style = 'bold';
-        color = [0, 128, 0]; // Green
+        color = [0, 128, 0]; // green
       } else if (isSelected && !isCorrect) {
         style = 'bold';
-        color = [255, 0, 0]; // Red
+        color = [255, 0, 0]; // red
       } else if (isCorrect) {
         style = 'italic';
-        color = [0, 128, 0]; // Green
+        color = [0, 128, 0]; // green
       }
 
       block.push({ content: text, styles: { textColor: color, fontStyle: style } });
@@ -681,7 +678,8 @@ function saveToGoogleSheet(examData) {
 
     return block;
   }
-}  
+}
+ 
     // Confirm refresh or page navigation
       window.addEventListener("beforeunload", function(event) {
         const isExamInProgress = startBtn.style.display === "none"; // Check if exam is ongoing
