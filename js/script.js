@@ -80,8 +80,7 @@
 
   // Disable and show spinner
   submitBtn.disabled = true;
-  submitBtn.innerHTML = `<i class="fa fa-spinner fa-spin"></i> Done ✓`;
-
+  submitBtn.innerHTML = `<i class="fa fa-check-circle" style="color:green;"></i> Done ✓`;
   setTimeout(() => {
     const answers1 = getSelectedOptions(slide1);
     const answers2 = getSelectedOptions(slide2);
