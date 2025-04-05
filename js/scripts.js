@@ -602,42 +602,94 @@ function saveToGoogleSheet(examData) {
         });
       }
 
-async function generatePDF(exam) {
+function generatePDF(exam) {
     const { jsPDF } = window.jspdf;
-    const doc = new jsPDF();
+    const doc = new jsPDF('landscape'); // Landscape for more width
 
     doc.setFontSize(16);
-    doc.text(`Results for ${exam.userName} - ${exam.testName}`, 10, 10);
+    doc.text(`Results for ${exam.userName} - ${exam.testName}`, 14, 15);
     doc.setFontSize(12);
-    doc.text(`Score: ${exam.score} / ${exam.maxScore}`, 10, 20);
+    doc.text(`Score: ${exam.score} / ${exam.maxScore}`, 14, 25);
 
-    let startY = 30;
+    const body = [];
+    const getColoredCell = (text, selected, correct, missed) => {
+        let styles = { text, fillColor: null, textColor: 20 };
 
-    // Table Headers
-    const headers = [["Q.No", "Selected", "Correct", "Result"]];
-    const rows = exam.results.map(result => [
-        result.question,
-        result.selectedOption || "—",
-        result.correctOption,
-        result.missed ? "Missed" : (result.correct ? "Correct" : "Incorrect")
-    ]);
+        if (missed) {
+            styles.fillColor = [0, 0, 0];
+            styles.textColor = [255, 255, 255];
+        } else if (selected && correct) {
+            styles.fillColor = [0, 128, 0]; // Green
+            styles.textColor = [255, 255, 255];
+        } else if (selected && !correct) {
+            styles.fillColor = [255, 0, 0]; // Red
+            styles.textColor = [255, 255, 255];
+        } else if (correct) {
+            styles.fillColor = [0, 128, 0]; // Show correct option green even if not selected
+            styles.textColor = [255, 255, 255];
+        }
+        return styles;
+    };
 
-    // Add AutoTable Plugin
+    const rows = [];
+    for (let i = 0; i < exam.results.length; i += 2) {
+        const row = [];
+
+        // Left question
+        const left = exam.results[i];
+        row.push({ content: left.question, styles: { halign: 'center' } });
+        ['A', 'B', 'C', 'D'].forEach(opt => {
+            row.push(getColoredCell(opt,
+                left.selectedOption === opt,
+                left.correctOption === opt,
+                left.missed));
+        });
+
+        // Right question (if exists)
+        if (i + 1 < exam.results.length) {
+            const right = exam.results[i + 1];
+            row.push({ content: right.question, styles: { halign: 'center' } });
+            ['A', 'B', 'C', 'D'].forEach(opt => {
+                row.push(getColoredCell(opt,
+                    right.selectedOption === opt,
+                    right.correctOption === opt,
+                    right.missed));
+            });
+        } else {
+            // Fill empty right side if only one question left
+            row.push({ content: '', colSpan: 5 });
+        }
+
+        rows.push(row);
+    }
+
+    const headers = [
+        'Q.No', 'A', 'B', 'C', 'D',
+        'Q.No', 'A', 'B', 'C', 'D'
+    ];
+
     doc.autoTable({
-        head: headers,
+        head: [headers],
         body: rows,
-        startY: startY,
+        startY: 35,
+        theme: 'grid',
         styles: {
+            halign: 'center',
+            valign: 'middle',
+            cellWidth: 'wrap',
             fontSize: 10,
-            cellPadding: 3
+            minCellHeight: 10
         },
-        headStyles: { fillColor: [22, 160, 133] }, // teal
-        alternateRowStyles: { fillColor: [240, 240, 240] }
+        headStyles: {
+            fillColor: [22, 160, 133],
+            textColor: 255,
+            fontStyle: 'bold'
+        }
     });
 
     doc.save(`Result_${exam.testName}_${exam.userName}.pdf`);
 }
- 
+
       // Confirm refresh or page navigation
       window.addEventListener("beforeunload", function(event) {
         const isExamInProgress = startBtn.style.display === "none"; // Check if exam is ongoing
