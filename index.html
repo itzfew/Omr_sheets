@@ -8,157 +8,125 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
-  /* Styling the button */
+    body {
+      margin: 0;
+      padding: 0;
+    }
+
+    .top-bar {
+      display: flex;
+      flex-wrap: nowrap;
+      justify-content: space-between;
+      align-items: center;
+      padding: 5px 10px;
+      background-color: #d32f2f;
+      color: white;
+      font-size: 14px;
+      font-weight: bold;
+      box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2);
+    }
+
+    .top-bar a {
+      color: white;
+      text-decoration: none;
+    }
+
+    .top-bar a:hover {
+      text-decoration: underline;
+    }
+
+    .news-badge {
+      background: yellow;
+      color: black;
+      font-size: 12px;
+      font-weight: bold;
+      padding: 3px 8px;
+      transform: rotate(-15deg);
+      border-radius: 3px;
+      margin-right: 10px;
+    }
+
     .button-container {
-    display: flex;
-    justify-content: center; /* Center align buttons */
-    gap: 15px; /* Space between buttons */
-    flex-wrap: wrap; /* Allows wrapping on smaller screens */
-}
-
-/* Ensures buttons resize well on smaller screens */
-@media (max-width: 768px) {
-    .button.avg-score-btn {
-        flex: 1; /* Makes them flexible */
-        min-width: 150px; /* Minimum width */
-        padding: 10px 20px;
-        font-size: 16px;
+      display: flex;
+      gap: 10px;
+      flex-wrap: nowrap;
     }
-}
-    
 
- .button.avg-score-btn {
-    padding: 2px 2px; /* More space inside the button */
-    font-size: 15px; /* Large text for readability */
-    font-weight: bold;  
-    background: linear-gradient(145deg, #007bff, #0056b3); /* Gradient for 3D effect */
-    color: white; /* White text */
-    border: none; /* No border */
-    border-radius: 10px; /* Smooth rounded corners */
-    cursor: pointer; /* Pointer cursor on hover */
-    transition: all 0.2s ease-in-out; /* Smooth transition */
-    box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.3), 
-                inset -2px -2px 5px rgba(255, 255, 255, 0.2); /* 3D Shadow effect */
-    display: flex; /* Flexbox for icon and text alignment */
-    align-items: center; /* Center items vertically */
-    justify-content: center; /* Center items horizontally */
-    gap: 10px; /* Space between icon and text */
-    text-align: center;
-    min-width: 220px; /* Ensures text fits properly */
-}
-
-/* Hover effect */
-.button.avg-score-btn:hover {
-    background: linear-gradient(145deg, #0056b3, #003f80); /* Darker 3D effect */
-    transform: translateY(-2px); /* Slight lift effect */
-    box-shadow: 6px 6px 12px rgba(0, 0, 0, 0.4);
-}
-
-/* Active (Clicked) Effect */
-.button.avg-score-btn:active {
-    background: linear-gradient(145deg, #004080, #002c60);
-    transform: translateY(2px); /* Pressed effect */
-    box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.2);
-}
-
-/* Responsive Design */
-@media (max-width: 768px) {
     .button.avg-score-btn {
-        padding: 10px 24px;
-        font-size: 16px;
-        min-width: 200px;
+      padding: 6px 12px;
+      font-size: 14px;
+      font-weight: bold;
+      background: linear-gradient(145deg, #007bff, #0056b3);
+      color: white;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: all 0.2s ease-in-out;
+      box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.3), 
+                  inset -2px -2px 5px rgba(255, 255, 255, 0.2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      min-width: 160px;
+      white-space: nowrap;
     }
-}
+
+    @media (max-width: 600px) {
+      .button.avg-score-btn span {
+        display: none;
+      }
+    }
 
     .modal {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0, 0, 0, 0.5);
-  z-index: 1000;
-}
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: 1000;
+    }
 
-.modal-content {
-  background: white;
-  padding: 10px;
-  border-radius: 20px;
-  width: 90%;
-  text-align: center;
-}
+    .modal-content {
+      background: white;
+      padding: 10px;
+      border-radius: 20px;
+      width: 90%;
+      text-align: center;
+    }
 
-.modal-close {
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  font-size: 20px;
-  cursor: pointer;
-}
-  .news-header {
-    background-color: #d32f2f; /* Red background */
-    color: white;
-    padding: 10px;
-    text-align: center;
-    font-size: 16px;
-    font-weight: bold;
-    border-radius: 20px;
-    position: relative;
-    width: 95%;
-    margin: 0px;
-    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2);
-  }
-
-  .news-header a {
-    text-decoration: none;
-    color: white;
-    font-weight: bold;
-  }
-
-  .news-header a:hover {
-    text-decoration: underline;
-  }
-
-  .news-badge {
-    position: absolute;
-    top: -10px;
-    left: -10px;
-    background: yellow;
-    color: black;
-    font-size: 12px;
-    font-weight: bold;
-    padding: 3px 8px;
-    transform: rotate(-15deg);
-    border-radius: 3px;
-    box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.3);
-  }
-</style>
+    .modal-close {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      font-size: 20px;
+      cursor: pointer;
+    }
+  </style>
 </head>
 <body>
-
-  <div class="news-header">
-  <div class="news-badge">NEW</div>
-  <a href="https://omrsheets.pages.dev/js/VID_20250403_232955_569.mp4" target="_blank">  🚀 How to use this site?  
-<b>Watch Now<b></b></a>  
-</div>
-<div class="button-container">
-    <button id="avgScoreBtn" class="button avg-score-btn">
-        <i class="fa fa-bullseye"></i> Calculate Final Exam Score
-    </button>
-
-    <button id="topUsersBtn" class="button avg-score-btn" onclick="window.location.href='results.html'">
-        <i class="fa fa-trophy"></i> Top Users
-    </button>
-</div>
-
+  <div class="top-bar">
+    <div class="news-badge">NEW</div>
+    <div>
+      <a href="https://omrsheets.pages.dev/js/VID_20250403_232955_569.mp4" target="_blank">🚀 How to use this site? <b>Watch Now</b></a>
+    </div>
+    <div class="button-container">
+      <button id="avgScoreBtn" class="button avg-score-btn">
+        <i class="fa fa-bullseye"></i> <span>Final Score</span>
+      </button>
+      <button id="topUsersBtn" class="button avg-score-btn" onclick="window.location.href='results.html'">
+        <i class="fa fa-trophy"></i> <span>Top Users</span>
+      </button>
+    </div>
+  </div>
 
   <h3>OMR Checking</h3>
-  <!-- New User Name Field -->
-<label for="userName">User Name:</label>
-<input type="text" id="userName" class="input" placeholder="Enter your name">
+  <label for="userName">User Name:</label>
+  <input type="text" id="userName" class="input" placeholder="Enter your name">
   <label for="testName">Test Name:</label>
   <input type="text" id="testName" class="input" placeholder="Enter test name">
   <label for="numQuestions">Number of Questions:</label>
@@ -176,7 +144,7 @@
 
   <button id="nextBtn" class="button next-btn" style="display:none">Next</button>
   <button id="prevBtn" class="button prev-btn" style="display:none">Previous</button>
-  <button id="submitBtn" class="button submit-btn"  style="display:none">Submit</button>
+  <button id="submitBtn" class="button submit-btn" style="display:none">Submit</button>
 
   <div id="slide2" class="slide">
     <p>Choose correct answers for respective questions:</p>
