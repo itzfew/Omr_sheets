@@ -1,12 +1,14 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Test Results</title>
-  
-  <!-- FontAwesome (Free CDN) -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+
+  <!-- FontAwesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
 
   <style>
     body {
@@ -19,7 +21,7 @@
       display: flex;
       justify-content: space-around;
       align-items: center;
-      background: linear-gradient(145deg, #007bff, #0056b3); /* Gradient for 3D effect */
+      background: linear-gradient(145deg, #007bff, #0056b3);
       padding: 10px 0;
       position: fixed;
       width: 100%;
@@ -37,7 +39,7 @@
       border-radius: 5px;
     }
     .table-container {
-      margin-top: 50px;
+      margin-top: 60px;
       padding: 0px;
       overflow-x: auto;
     }
@@ -51,9 +53,8 @@
       text-align: center;
     }
     th {
-      background-color: #000000;
-      color: white;
-      font-weight: 600;
+      background-color: #000;
+      color: #fff;
     }
     td {
       border-bottom: 1px solid #ddd;
@@ -70,7 +71,6 @@
       font-weight: bold;
       color: #28a745;
     }
-    /* Full-Screen Detail View */
     .fullscreen {
       position: fixed;
       top: 0;
@@ -101,13 +101,6 @@
       cursor: pointer;
       color: white;
     }
-    @media (max-width: 600px) {
-      table {
-        display: block;
-        overflow-x: auto;
-        white-space: nowrap;
-      }
-    }
   </style>
 </head>
 <body>
@@ -115,6 +108,7 @@
   <nav>
     <a href="index.html"><b>HOME</b></a>
     <a href="streaks.html"><b>STREAKS</b></a>
+    <a href="#" onclick="generatePDF()"><b><i class="fa fa-file-pdf"></i> Generate PDF</b></a>
   </nav>
 
   <div class="table-container">
@@ -130,13 +124,10 @@
           <th>Percentage <i class="fa fa-chart-line"></i></th>
         </tr>
       </thead>
-      <tbody id="resultsBody">
-        <!-- Populated dynamically -->
-      </tbody>
+      <tbody id="resultsBody"></tbody>
     </table>
   </div>
 
-  <!-- Full-Screen Details View -->
   <div id="fullscreenView" class="fullscreen">
     <span class="close-btn" onclick="closeFullscreen()"><i class="fa fa-arrow-left"></i> Back</span>
     <h2 id="fsTestName"></h2>
@@ -156,16 +147,13 @@
     async function fetchSheet() {
       const res = await fetch(sheetCSV);
       const text = await res.text();
-      const rows = text.trim().split("\n").slice(1); // Skip header
+      const rows = text.trim().split("\n").slice(1);
       let data = rows.map(row => row.split(","));
-
-      // Sort by date (latest first)
       data.sort((a, b) => new Date(b[0]) - new Date(a[0]));
-
-      // Limit to the latest 20 entries
       data = data.slice(0, 20);
 
       const tbody = document.getElementById("resultsBody");
+      tbody.innerHTML = "";
 
       data.forEach((row, index) => {
         const [date, userName, testName, qNo, correct, wrong, missed, score, maxMarks] = row;
@@ -205,8 +193,52 @@
       document.getElementById("fullscreenView").style.display = "none";
     }
 
+    async function generatePDF() {
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF();
+
+      const res = await fetch(sheetCSV);
+      const text = await res.text();
+      const rows = text.trim().split("\n").slice(1);
+      let data = rows.map(row => row.split(","));
+      data.sort((a, b) => new Date(b[0]) - new Date(a[0]));
+      data = data.slice(0, 20);
+
+      const tableData = data.map((row, index) => {
+        const [date, userName, testName, qNo, correct, wrong, missed, score, maxMarks] = row;
+        const percentage = ((score / maxMarks) * 100).toFixed(2);
+        let status = "";
+        if (percentage >= 90) status = "Topper 🌟";
+        else if (percentage >= 80) status = "Excellent ✅";
+        else if (percentage >= 60) status = "Good 🙂";
+        else status = "Needs Improvement ⚠️";
+
+        return [
+          index + 1,
+          new Date(date).toLocaleDateString(),
+          userName,
+          `${score} / ${maxMarks}`,
+          `${percentage}%`,
+          status
+        ];
+      });
+
+      doc.setFontSize(18);
+      doc.text("NEET Test Results (Top 20)", 14, 20);
+
+      doc.autoTable({
+        startY: 30,
+        head: [["S.No.", "Date", "Name", "Score / Max", "Percentage", "Status"]],
+        body: tableData,
+        styles: { fontSize: 10, cellPadding: 3 },
+        headStyles: { fillColor: [40, 40, 40], textColor: 255, fontStyle: 'bold' },
+        alternateRowStyles: { fillColor: [240, 240, 240] }
+      });
+
+      doc.save("NEET_Test_Results.pdf");
+    }
+
     fetchSheet();
   </script>
-
 </body>
 </html>
