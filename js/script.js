@@ -74,46 +74,56 @@
         slide3.style.display = "none";
       });
 
-      submitBtn.addEventListener("click", function() {
-    const userConfirmed = confirm("Are you sure you want to submit your answers?");
-    if (!userConfirmed) {
-        return;
-    }
+      submitBtn.addEventListener("click", function () {
+  const userConfirmed = confirm("Are you sure you want to submit your answers?");
+  if (!userConfirmed) return;
 
-    // Disable the submit button to prevent multiple submissions
-    submitBtn.disabled = true;
+  // Disable and animate the submit button
+  submitBtn.disabled = true;
+  submitBtn.innerHTML = `<i class="fa fa-spinner fa-spin"></i> Submitting...`;
 
+  setTimeout(() => {
     const answers1 = getSelectedOptions(slide1);
     const answers2 = getSelectedOptions(slide2);
     const results = matchAnswers(answers1, answers2);
     const { score, maxScore } = calculateScore(results);
+
     const testName = document.getElementById("testName").value.trim();
     const userName = document.getElementById("userName").value.trim();
+
     displayResults(results, userName, testName, score, maxScore);
     saveResults(userName, testName, results, score, maxScore);
+
+    // Hide buttons
     submitBtn.style.display = "none";
     prevBtn.style.display = "none";
     resultBtn.style.display = "block";
+
     clearInterval(timerInterval);
     timerElement.style.display = "none";
+
+    // Prepare modal message
     const correctCount = results.filter(result => result.correct).length;
     const incorrectCount = results.filter(result => !result.correct && !result.missed).length;
     const missedCount = results.filter(result => result.missed).length;
+
     const message = `
-      <p><strong>Number of Questions:</strong> ${answers1.length}</p>
-      <p><strong>Correct Answers:</strong> ${correctCount}</p>
-      <p><strong>Incorrect Answers:</strong> ${incorrectCount}</p>
-      <p><strong>Missed Questions:</strong> ${missedCount}</p>
-      <p><strong>Score:</strong> ${score} / ${maxScore}</p>
+      <p><strong><i class="fa fa-question-circle"></i> Total Questions:</strong> ${answers1.length}</p>
+      <p><strong><i class="fa fa-check-circle" style="color:green;"></i> Correct:</strong> ${correctCount}</p>
+      <p><strong><i class="fa fa-times-circle" style="color:red;"></i> Incorrect:</strong> ${incorrectCount}</p>
+      <p><strong><i class="fa fa-ban" style="color:orange;"></i> Missed:</strong> ${missedCount}</p>
+      <p><strong><i class="fa fa-star"></i> Score:</strong> ${score} / ${maxScore}</p>
     `;
+
     showModal(message);
     updateChart();
     updateComparison();
 
-    // Auto-scroll to the results section
+    // Smooth scroll to results
     slide3.scrollIntoView({ behavior: 'smooth' });
+  }, 500); // Delay for spinner (optional)
 });
-        
+
 
       function updateTimer() {
         const currentTime = new Date();
