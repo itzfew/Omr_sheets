@@ -1,11 +1,11 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>OMR Checking</title>
-  <link rel="stylesheet" type="text/css" href="css/style.css">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"/>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
     body {
@@ -54,13 +54,13 @@
       margin-right: 10px;
     }
 
-    .button-container1 {
+    .button-container {
       display: flex;
       gap: 10px;
       flex-wrap: nowrap;
     }
 
-    .button.avg-score-btn {
+    .score-button {
       padding: 6px 12px;
       font-size: 14px;
       font-weight: bold;
@@ -70,7 +70,7 @@
       border-radius: 10px;
       cursor: pointer;
       transition: all 0.2s ease-in-out;
-      box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.3), 
+      box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.3),
                   inset -2px -2px 5px rgba(255, 255, 255, 0.2);
       display: flex;
       align-items: center;
@@ -81,22 +81,21 @@
     }
 
     @media (max-width: 600px) {
-      
-    .button.avg-score-btn {
-      min-width: 50px;
-      font-size: 12px;
-      padding: 7px 19px;
-      min-width: auto;
+      .score-button {
+        font-size: 12px;
+        padding: 7px 19px;
+        min-width: auto;
+      }
+
+      .button-container {
+        gap: 3px;
+      }
+
+      .score-button span {
+        display: none;
+      }
     }
 
-    .button-container1 {
-      gap: 3px;
-    }
-
-    .button.avg-score-btn span {
-      display: none;
-    }
-  }
     .modal {
       display: flex;
       justify-content: center;
@@ -132,29 +131,31 @@
     <div class="top-bar-item visible">
       <div class="news-badge">NEW</div>
       <div>
-        <a href="https://omrsheets.pages.dev/js/VID_20250403_232955_569.mp4" target="_blank">🚀 How to use this site? <b>Watch Now</b></a>
+        <a href="https://omrsheets.pages.dev/js/VID_20250403_232955_569.mp4" target="_blank">
+          🚀 How to use this site? <b>Watch Now</b>
+        </a>
       </div>
     </div>
     <div class="top-bar-item">
       <div class="news-badge">NEW</div>
-      <div class="button1-container">
-        <button1 id="avgScoreBtn" class="button avg-score-btn">
+      <div class="button-container">
+        <button id="avgScoreBtn" class="score-button">
           <i class="fa fa-bullseye"></i> <span>Final Score</span>
-        </button1>
-        <button1 id="topUsersBtn" class="button avg-score-btn" onclick="window.location.href='results.html'">
+        </button>
+        <button id="topUsersBtn" class="score-button" onclick="window.location.href='results.html'">
           <i class="fa fa-trophy"></i> <span>Top Users</span>
-        </button1>
+        </button>
       </div>
     </div>
   </div>
 
   <h3>OMR Checking</h3>
   <label for="userName">User Name:</label>
-  <input type="text" id="userName" class="input" placeholder="Enter your name">
+  <input type="text" id="userName" class="input" placeholder="Enter your name" />
   <label for="testName">Test Name:</label>
-  <input type="text" id="testName" class="input" placeholder="Enter test name">
+  <input type="text" id="testName" class="input" placeholder="Enter test name" />
   <label for="numQuestions">Number of Questions:</label>
-  <input type="number" id="numQuestions" min="1" max="200" value="15" class="input">
+  <input type="number" id="numQuestions" min="1" max="200" value="15" class="input" />
   <button id="startBtn" class="button start-btn">Start Quiz</button>
 
   <div id="timer" class="timer" style="display:none;">
@@ -176,7 +177,6 @@
   </div>
 
   <div id="slide3" class="slide"></div>
-
   <div id="examList"></div>
 
   <div class="chart-container">
@@ -190,9 +190,7 @@
     let currentTopIndex = 0;
 
     function loopTopItems() {
-      topElements.forEach((el, idx) => {
-        el.classList.remove('visible');
-      });
+      topElements.forEach(el => el.classList.remove('visible'));
       topElements[currentTopIndex].classList.add('visible');
       currentTopIndex = (currentTopIndex + 1) % topElements.length;
     }
@@ -202,12 +200,9 @@
 
     function updateButtonTextVisibility() {
       const width = window.innerWidth;
-      document.querySelectorAll('.avg-score-btn').forEach(button => {
-        if (width < 500) {
-          button.querySelector('span')?.classList.add('hidden');
-        } else {
-          button.querySelector('span')?.classList.remove('hidden');
-        }
+      document.querySelectorAll('.score-button').forEach(button => {
+        const span = button.querySelector('span');
+        if (span) span.style.display = width < 500 ? 'none' : 'inline';
       });
     }
 
