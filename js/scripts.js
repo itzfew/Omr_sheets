@@ -615,7 +615,6 @@ async function generatePDF(exam) {
   y += 10;
 
   const rows = [];
-  const circleMap = { A: 'Ⓐ', B: 'Ⓑ', C: 'Ⓒ', D: 'Ⓓ' };
 
   // Process in groups of 10 (5 left, 5 right)
   for (let i = 0; i < exam.results.length; i += 10) {
@@ -632,7 +631,7 @@ async function generatePDF(exam) {
 
   doc.autoTable({
     startY: y,
-    head: [['Q', 'Ⓐ', 'Ⓑ', 'Ⓒ', 'Ⓓ', '', 'Q', 'Ⓐ', 'Ⓑ', 'Ⓒ', 'Ⓓ']],
+    head: [['No.', 'A', 'B', 'C', 'D', '', 'No.', 'A', 'B', 'C', 'D']],
     body: rows,
     styles: {
       cellPadding: 2,
@@ -642,6 +641,30 @@ async function generatePDF(exam) {
     columnStyles: {
       0: { cellWidth: 10 }, 5: { cellWidth: 5 },
       6: { cellWidth: 10 }
+    },
+    didDrawCell: function (data) {
+      const cell = data.cell;
+      const text = data.cell.raw;
+
+      if (
+        typeof text === 'object' &&
+        text.content &&
+        ['A', 'B', 'C', 'D'].includes(text.content)
+      ) {
+        const x = cell.textPos.x - 1;
+        const y = cell.textPos.y - 2;
+        const radius = 3.5;
+
+        // Draw circle
+        doc.setDrawColor(...(text.styles?.textColor || [0, 0, 0]));
+        doc.setLineWidth(0.3);
+        doc.circle(x + 1.5, y - 0.5, radius);
+
+        // Draw letter inside
+        doc.setTextColor(...(text.styles?.textColor || [0, 0, 0]));
+        doc.setFont(undefined, text.styles?.fontStyle || 'normal');
+        doc.text(text.content, x, y + 1.5);
+      }
     }
   });
 
@@ -650,13 +673,12 @@ async function generatePDF(exam) {
   function formatQuestionBlock(res, qIndex) {
     if (!res) return ['', '', '', '', '']; // filler for empty cells
 
-    const block = [`Q${qIndex + 1}`];
+    const block = [`${qIndex + 1}.`];
 
     ['A', 'B', 'C', 'D'].forEach(opt => {
       const isSelected = res.selectedOption === opt;
       const isCorrect = res.correctOption === opt;
 
-      let text = circleMap[opt];
       let style = 'normal';
       let color = [0, 0, 0];
 
@@ -675,13 +697,13 @@ async function generatePDF(exam) {
         color = [0, 128, 0]; // Green
       }
 
-      block.push({ content: text, styles: { textColor: color, fontStyle: style } });
+      block.push({ content: opt, styles: { textColor: color, fontStyle: style } });
     });
 
     return block;
   }
 }
-
+ 
     // Confirm refresh or page navigation
       window.addEventListener("beforeunload", function(event) {
         const isExamInProgress = startBtn.style.display === "none"; // Check if exam is ongoing
