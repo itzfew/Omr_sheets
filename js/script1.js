@@ -3,7 +3,7 @@ async function generatePDF(exam) {
   const doc = new jsPDF('p', 'mm', 'a4');
   const cellHeight = 10;
   const boxPadding = 2;
-  const circleRadius = 3;
+  const circleRadius = 4;
   let y = 10;
 
   doc.setFontSize(14);
@@ -43,7 +43,7 @@ async function generatePDF(exam) {
     doc.text(`Q${qIndex + 1}`, x, y + 5);
 
     const options = ['A', 'B', 'C', 'D'];
-    const optionGap = 15;
+    const optionGap = 18;
     let cx = x + 20;
 
     options.forEach(opt => {
@@ -51,32 +51,30 @@ async function generatePDF(exam) {
       const isCorrect = res.correctOption === opt;
       const missed = res.missed;
 
-      let color = [0, 0, 0]; // default black
+      let fillColor = [255, 255, 255];
+      let strokeColor = [0, 0, 0];
 
       if (missed) {
-        if (isCorrect) color = [0, 128, 0]; // green
-        else color = [255, 204, 0]; // yellow for unselected
+        if (isCorrect) fillColor = [0, 128, 0];
+        else strokeColor = [255, 204, 0];
       } else if (isSelected && isCorrect) {
-        color = [0, 128, 0]; // green
+        fillColor = [0, 128, 0];
       } else if (isSelected && !isCorrect) {
-        color = [255, 0, 0]; // red
+        fillColor = [255, 0, 0];
       } else if (isCorrect) {
-        color = [0, 128, 0]; // green
+        fillColor = [0, 128, 0];
       }
 
-      // Draw colored circle
-      doc.setDrawColor(...color);
-      doc.setFillColor(...color);
-      doc.circle(cx, y + 5, circleRadius, 'F');
+      doc.setDrawColor(...strokeColor);
+      doc.setFillColor(...fillColor);
+      doc.circle(cx, y + 5, circleRadius, 'FD');
 
-      // Draw option letter inside circle
-      doc.setTextColor(255, 255, 255);
-      doc.setFontSize(12);
+      doc.setTextColor(0, 0, 0); // Always black text
+      doc.setFontSize(9);
       doc.setFont(undefined, 'bold');
-      doc.text(opt.toLowerCase(), cx - 1.5, y + 5.5);
+      doc.text(opt.toLowerCase(), cx - 2.1, y + 5.2);
 
       cx += optionGap;
     });
   }
 }
- 
