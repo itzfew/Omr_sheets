@@ -75,37 +75,45 @@
       });
 
       submitBtn.addEventListener("click", function() {
-        const userConfirmed = confirm("Are you sure you want to submit your answers?");
-        if (!userConfirmed) {
-          return;
-        }
-        const answers1 = getSelectedOptions(slide1);
-        const answers2 = getSelectedOptions(slide2);
-        const results = matchAnswers(answers1, answers2);
-        const { score, maxScore } = calculateScore(results);
-        const testName = document.getElementById("testName").value.trim();
-        const userName = document.getElementById("userName").value.trim();
-        displayResults(results, userName, testName, score, maxScore);
-        saveResults(userName, testName, results, score, maxScore);
-        submitBtn.style.display = "none";
-        prevBtn.style.display = "none";
-        resultBtn.style.display = "block";
-        clearInterval(timerInterval);
-        timerElement.style.display = "none";
-        const correctCount = results.filter(result => result.correct).length;
-        const incorrectCount = results.filter(result => !result.correct && !result.missed).length;
-        const missedCount = results.filter(result => result.missed).length;
-        const message = `
-          <p><strong>Number of Questions:</strong> ${answers1.length}</p>
-          <p><strong>Correct Answers:</strong> ${correctCount}</p>
-          <p><strong>Incorrect Answers:</strong> ${incorrectCount}</p>
-          <p><strong>Missed Questions:</strong> ${missedCount}</p>
-          <p><strong>Score:</strong> ${score} / ${maxScore}</p>
-        `;
-        showModal(message);
-        updateChart();
-        updateComparison();
-      });
+    const userConfirmed = confirm("Are you sure you want to submit your answers?");
+    if (!userConfirmed) {
+        return;
+    }
+
+    // Disable the submit button to prevent multiple submissions
+    submitBtn.disabled = true;
+
+    const answers1 = getSelectedOptions(slide1);
+    const answers2 = getSelectedOptions(slide2);
+    const results = matchAnswers(answers1, answers2);
+    const { score, maxScore } = calculateScore(results);
+    const testName = document.getElementById("testName").value.trim();
+    const userName = document.getElementById("userName").value.trim();
+    displayResults(results, userName, testName, score, maxScore);
+    saveResults(userName, testName, results, score, maxScore);
+    submitBtn.style.display = "none";
+    prevBtn.style.display = "none";
+    resultBtn.style.display = "block";
+    clearInterval(timerInterval);
+    timerElement.style.display = "none";
+    const correctCount = results.filter(result => result.correct).length;
+    const incorrectCount = results.filter(result => !result.correct && !result.missed).length;
+    const missedCount = results.filter(result => result.missed).length;
+    const message = `
+      <p><strong>Number of Questions:</strong> ${answers1.length}</p>
+      <p><strong>Correct Answers:</strong> ${correctCount}</p>
+      <p><strong>Incorrect Answers:</strong> ${incorrectCount}</p>
+      <p><strong>Missed Questions:</strong> ${missedCount}</p>
+      <p><strong>Score:</strong> ${score} / ${maxScore}</p>
+    `;
+    showModal(message);
+    updateChart();
+    updateComparison();
+
+    // Auto-scroll to the results section
+    slide3.scrollIntoView({ behavior: 'smooth' });
+});
+        
 
       function updateTimer() {
         const currentTime = new Date();
