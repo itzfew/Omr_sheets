@@ -580,12 +580,46 @@ function saveToGoogleSheet(examData) {
         });
       }
       function handleSubmit() {
-    // Hide the submit button
-    document.getElementById("submitBtn").style.display = "none";
+  const submitBtn = document.getElementById("submitBtn");
+  submitBtn.innerHTML = `<i class="fa fa-spinner fa-spin"></i> Submitting...`;
+  submitBtn.disabled = true;
 
-    // (Optional) You can continue with your form submission logic here
-    // e.g., send data to Google Sheets or API
-  } 
+  // 🧠 Continue your submission logic here
+  setTimeout(() => {
+    // Simulate processing time (remove this timeout in real case)
+
+    // ✅ Hide button after processing
+    submitBtn.style.display = "none";
+
+    // ✅ Show success message
+    showModal(`<i class="fa fa-check-circle" style="color:green;"></i> <br><b>Submitted Successfully!</b><br>Your results have been saved.`);
+
+    // ✅ Scroll to result section if available
+    const resultSection = document.getElementById("slide3");
+    if (resultSection) {
+      resultSection.scrollIntoView({ behavior: "smooth" });
+    }
+
+  }, 1000); // Simulated delay - remove this in production
+}
+function showModal(message) {
+  const modal = document.createElement('div');
+  modal.classList.add('modal');
+  modal.innerHTML = `
+    <div class="modal-content">
+      ${message}
+      <span class="modal-close">&times;</span>
+    </div>
+  `;
+  document.body.appendChild(modal);
+
+  const closeBtn = modal.querySelector('.modal-close');
+  closeBtn.addEventListener('click', () => modal.remove());
+  modal.addEventListener('click', (e) => {
+    if (e.target === modal) modal.remove();
+  });
+}
+
       // Confirm refresh or page navigation
       window.addEventListener("beforeunload", function(event) {
         const isExamInProgress = startBtn.style.display === "none"; // Check if exam is ongoing
