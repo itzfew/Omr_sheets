@@ -614,77 +614,79 @@ async function generatePDF(exam) {
   doc.text(`Score: ${exam.score} / ${exam.maxScore}`, 10, y);
   y += 10;
 
-  const columns = [[], []];
-  let colIndex = 0, count = 0;
+  const circled = { A: 'Ⓐ', B: 'Ⓑ', C: 'Ⓒ', D: 'Ⓓ' };
+  const col1 = [], col2 = [];
 
   exam.results.forEach((res, index) => {
-    const qLabel = `Q${index + 1}`;
+    const questionNumber = `Q${index + 1}`;
+    const block = [{ content: questionNumber, styles: { fontStyle: 'bold' } }];
 
-    const optionRow = ['A', 'B', 'C', 'D'].map((opt) => {
-      const isCorrect = res.correctOption === opt;
+    ['A', 'B', 'C', 'D'].forEach(opt => {
       const isSelected = res.selectedOption === opt;
+      const isCorrect = res.correctOption === opt;
 
-      let color = [0, 0, 0]; // black
-      if (isCorrect) {
+      let text = circled[opt];
+      let style = 'normal';
+      let color = [0, 0, 0]; // default black
+
+      if (res.missed) {
+        if (isCorrect) {
+          color = [0, 128, 0]; // green
+        }
+      } else if (isSelected && isCorrect) {
+        style = 'bold';
         color = [0, 128, 0]; // green
-      } else if (isSelected) {
+      } else if (isSelected && !isCorrect) {
+        style = 'bold';
         color = [255, 0, 0]; // red
+      } else if (isCorrect) {
+        style = 'italic';
+        color = [0, 128, 0]; // green
       }
 
-      return {
-        content: `◯ ${opt}`,
-        styles: {
-          textColor: color,
-          fontStyle: isSelected ? 'bold' : 'normal'
-        }
-      };
+      block.push({ content: text, styles: { fontStyle: style, textColor: color } });
     });
 
-    const block = [
-      { content: qLabel, colSpan: 4, styles: { fontStyle: 'bold' } },
-      ...optionRow
-    ];
-
-    columns[colIndex].push(block);
-    count++;
-    if (count === 5) {
-      colIndex++;
-      count = 0;
+    const position = Math.floor(index / 5) % 2 === 0 ? col1 : col2;
+    if (!position[Math.floor(index / 10)]) {
+      position[Math.floor(index / 10)] = [];
     }
+    position[Math.floor(index / 10)].push(block);
   });
 
-  const tableRows = [];
-  const maxRows = Math.max(columns[0].length, columns[1].length);
-  for (let i = 0; i < maxRows; i++) {
-    const left = columns[0][i] || [
-      { content: '', colSpan: 4 },
-      { content: '' }, { content: '' }, { content: '' }, { content: '' }
-    ];
-    const right = columns[1][i] || [
-      { content: '', colSpan: 4 },
-      { content: '' }, { content: '' }, { content: '' }, { content: '' }
-    ];
-    tableRows.push([...left, { content: '' }, ...right]);
+  // Now render row-wise
+  const finalRows = [];
+  const maxGroups = Math.max(col1.length, col2.length);
+
+  for (let i = 0; i < maxGroups; i++) {
+    const leftBlocks = col1[i] || [];
+    const rightBlocks = col2[i] || [];
+
+    for (let j = 0; j < 5; j++) {
+      const left = leftBlocks[j] || ['', '', '', '', ''];
+      const right = rightBlocks[j] || ['', '', '', '', ''];
+      finalRows.push([...left, '', ...right]);
+    }
   }
 
   doc.autoTable({
     startY: y,
-    head: [[
-      { content: 'Q', colSpan: 1 },
-      { content: 'A' }, { content: 'B' }, { content: 'C' }, { content: 'D' },
-      { content: '' },
-      { content: 'Q' }, { content: 'A' }, { content: 'B' }, { content: 'C' }, { content: 'D' },
-    ]],
-    body: tableRows,
-    styles: { fontSize: 10, cellPadding: 1 },
+    head: [['Q', 'A', 'B', 'C', 'D', '', 'Q', 'A', 'B', 'C', 'D']],
+    body: finalRows,
+    styles: {
+      fontSize: 10,
+      cellPadding: 2,
+    },
     columnStyles: {
-      0: { cellWidth: 8 }, 5: { cellWidth: 5 }, 6: { cellWidth: 8 }
+      0: { cellWidth: 10 },
+      5: { cellWidth: 5 },
+      6: { cellWidth: 10 }
     }
   });
 
   doc.save(`${exam.userName}_${exam.testName}_results.pdf`);
 }
- 
+
       // Confirm refresh or page navigation
       window.addEventListener("beforeunload", function(event) {
         const isExamInProgress = startBtn.style.display === "none"; // Check if exam is ongoing
