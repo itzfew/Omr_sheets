@@ -108,7 +108,7 @@
   <nav>
     <a href="index.html"><b>HOME</b></a>
     <a href="streaks.html"><b>STREAKS</b></a>
-    <a href="#" onclick="generatePDF()"><b><i class="fa fa-file-pdf"></i> Generate PDF</b></a>
+    <a href="#" onclick="generatePDF()"><b><i class="fa fa-file-pdf"></i> PDF</b></a>
   </nav>
 
   <div class="table-container">
@@ -195,7 +195,7 @@
 
     async function generatePDF() {
       const { jsPDF } = window.jspdf;
-      const doc = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" });
+      const doc = new jsPDF({ orientation: "landscape", unit: "pt", format: "a4" });
 
       const res = await fetch(sheetCSV);
       const text = await res.text();
@@ -217,7 +217,6 @@
           index + 1,
           new Date(date).toLocaleDateString(),
           userName,
-          testName,
           `${score} / ${maxMarks}`,
           `${percentage}%`,
           status
@@ -225,22 +224,23 @@
       });
 
       doc.setFontSize(18);
-      doc.text("NEET Test Results (Top 20)", 14, 20);
+      doc.text("NEET Test Results (Top 20)", 40, 40);
 
       doc.autoTable({
-        startY: 30,
-        head: [["S.No.", "Date", "Name", "Test", "Score / Max", "Percentage", "Status"]],
+        startY: 60,
+        head: [["S.No.", "Date", "Name", "Score / Max", "Percentage", "Status"]],
         body: tableData,
-        styles: { fontSize: 10, cellPadding: 2 },
+        styles: { fontSize: 10, cellPadding: 5, overflow: 'linebreak' },
         headStyles: { fillColor: [40, 40, 40], textColor: 255, fontStyle: 'bold' },
-        alternateRowStyles: { fillColor: [240, 240, 240] }
+        alternateRowStyles: { fillColor: [240, 240, 240] },
+        margin: { left: 40, right: 40 },
+        tableWidth: 'auto'
       });
 
-      const finalY = doc.lastAutoTable.finalY + 10;
-      doc.setFontSize(11);
-      doc.text("Dear Students, improve your score by attempting tests. Congratulations to all toppers!", 14, finalY);
-      doc.text("Visit: https://omrsheets.pages.dev/", 14, finalY + 6);
-      doc.text("Contact us on Telegram: @NeetAspirantsBot", 14, finalY + 12);
+      doc.setFontSize(12);
+      doc.text("Dear Students, improve your score by attempting tests. Congratulations to all toppers!", 40, doc.internal.pageSize.height - 60);
+      doc.text("Visit: https://omrsheets.pages.dev/", 40, doc.internal.pageSize.height - 40);
+      doc.text("Contact: Telegram @NeetAspirantsBot", 40, doc.internal.pageSize.height - 20);
 
       doc.save("NEET_Test_Results.pdf");
     }
