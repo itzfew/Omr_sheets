@@ -1,26 +1,30 @@
-  document.addEventListener("DOMContentLoaded", function() {
-      const startBtn = document.getElementById("startBtn");
-      const nextBtn = document.getElementById("nextBtn");
-      const prevBtn = document.getElementById("prevBtn");
-      const submitBtn = document.getElementById("submitBtn");
-      const resultBtn = document.createElement('button');
-      const slide1 = document.getElementById("slide1");
-      const slide2 = document.getElementById("slide2");
-      const slide3 = document.getElementById("slide3");
-      const examList = document.getElementById("examList");
-      const timerElement = document.getElementById("timer");
-      const elapsedTimeElement = document.getElementById("elapsedTime");
-      const chartCanvas = document.getElementById("resultsChart").getContext("2d");
-      const comparisonResults = document.getElementById("comparisonResults");
+document.addEventListener('DOMContentLoaded', function() {
+    const { jsPDF } = window.jspdf;
 
-      let timerInterval;
-      let startTime;
+    const startBtn = document.getElementById("startBtn");
+    const nextBtn = document.getElementById("nextBtn");
+    const prevBtn = document.getElementById("prevBtn");
+    const submitBtn = document.getElementById("submitBtn");
+    const resultBtn = document.createElement('button');
+    const generatePdfBtn = document.createElement('button');
+    const slide1 = document.getElementById("slide1");
+    const slide2 = document.getElementById("slide2");
+    const slide3 = document.getElementById("slide3");
+    const examList = document.getElementById("examList");
+    const timerElement = document.getElementById("timer");
+    const elapsedTimeElement = document.getElementById("elapsedTime");
+    const chartCanvas = document.getElementById("resultsChart").getContext("2d");
+    const comparisonResults = document.getElementById("comparisonResults");
 
-      resultBtn.classList.add('button', 'new-exam-btn');
-      resultBtn.style.display = "none";
-      resultBtn.textContent = "New Exam";
-      resultBtn.addEventListener('click', () => {
+    let timerInterval;
+    let startTime;
+
+    resultBtn.classList.add('button', 'new-exam-btn');
+    resultBtn.style.display = "none";
+    resultBtn.textContent = "New Exam";
+    resultBtn.addEventListener('click', () => {
         document.getElementById("testName").value = '';
+        document.getElementById("userName").value = '';
         document.getElementById("numQuestions").value = 15;
         startBtn.style.display = "block";
         slide1.style.display = "none";
@@ -34,75 +38,139 @@
         elapsedTimeElement.textContent = "00:00:00";
         updateChart();
         updateComparison();
-      });
+    });
 
-      startBtn.addEventListener("click", function() {
+    startBtn.addEventListener("click", function() {
         const testName = document.getElementById("testName").value.trim();
+        const userName = document.getElementById("userName").value.trim();
         const numQuestions = parseInt(document.getElementById("numQuestions").value);
-        if (testName === "" || numQuestions <= 0) {
-          alert("Please enter a valid test name and number of questions.");
-          return;
+        if (userName === "" || testName === "" || numQuestions <= 0) {
+            alert("Please enter a valid user name and test name and number of questions.");
+            return;
         }
         populateSlides(numQuestions);
         startBtn.style.display = "none";
         document.getElementById("testName").style.display = "none";
+        document.getElementById("userName").style.display = "none";
         document.getElementById("numQuestions").style.display = "none";
         nextBtn.style.display = "block";
         slide1.style.display = "block";
         timerElement.style.display = "block";
         startTime = new Date();
         timerInterval = setInterval(updateTimer, 1000);
-      });
+    });
 
-      nextBtn.addEventListener("click", function() {
+    nextBtn.addEventListener("click", function() {
         slide1.style.display = "none";
         slide2.style.display = "block";
         nextBtn.style.display = "none";
         prevBtn.style.display = "block";
         submitBtn.style.display = "block";
-      });
+    });
 
-      prevBtn.addEventListener("click", function() {
+    prevBtn.addEventListener("click", function() {
         slide2.style.display = "none";
         slide1.style.display = "block";
         prevBtn.style.display = "none";
         nextBtn.style.display = "block";
         submitBtn.style.display = "none";
         slide3.style.display = "none";
-      });
+    });
 
-      submitBtn.addEventListener("click", function() {
+    submitBtn.addEventListener("click", function () {
         const userConfirmed = confirm("Are you sure you want to submit your answers?");
-        if (!userConfirmed) {
-          return;
-        }
-        const answers1 = getSelectedOptions(slide1);
-        const answers2 = getSelectedOptions(slide2);
-        const results = matchAnswers(answers1, answers2);
-        const { score, maxScore } = calculateScore(results);
-        const testName = document.getElementById("testName").value.trim();
-        displayResults(results, testName, score, maxScore);
-        saveResults(testName, results, score, maxScore);
-        submitBtn.style.display = "none";
-        prevBtn.style.display = "none";
-        resultBtn.style.display = "block";
-        clearInterval(timerInterval);
-        timerElement.style.display = "none";
-        const correctCount = results.filter(result => result.correct).length;
-        const incorrectCount = results.filter(result => !result.correct && !result.missed).length;
-        const missedCount = results.filter(result => result.missed).length;
-        const message = `
-          <p><strong>Number of Questions:</strong> ${answers1.length}</p>
-          <p><strong>Correct Answers:</strong> ${correctCount}</p>
-          <p><strong>Incorrect Answers:</strong> ${incorrectCount}</p>
-          <p><strong>Missed Questions:</strong> ${missedCount}</p>
-          <p><strong>Score:</strong> ${score} / ${maxScore}</p>
-        `;
-        showModal(message);
-        updateChart();
-        updateComparison();
-      });
+        if (!userConfirmed) return;
 
+        // Disable and show spinner
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = `<i class="fa fa-check-circle" style="color:green;"></i> Done ✓`;
+        setTimeout(() => {
+            const answers1 = getSelectedOptions(slide1);
+            const answers2 = getSelectedOptions(slide2);
+            const results = matchAnswers(answers1, answers2);
+            const { score, maxScore } = calculateScore(results);
+
+            const testName = document.getElementById("testName").value.trim();
+            const userName = document.getElementById("userName").value.trim();
+
+            displayResults(results, userName, testName, score, maxScore);
+            saveResults(userName, testName, results, score, maxScore);
+
+            // ✅ Hide buttons after processing
+            submitBtn.style.display = "none";
+            prevBtn.style.display = "none";
+            resultBtn.style.display = "block";
+
+            clearInterval(timerInterval);
+            timerElement.style.display = "none";
+
+            const correctCount = results.filter(result => result.correct).length;
+            const incorrectCount = results.filter(result => !result.correct && !result.missed).length;
+            const missedCount = results.filter(result => result.missed).length;
+
+            const message = `
+                <p><strong>Total Questions:</strong> ${answers1.length}</p>
+                <p><strong>Correct:</strong> ${correctCount}</p>
+                <p><strong>Incorrect:</strong> ${incorrectCount}</p>
+                <p><strong>Missed:</strong> ${missedCount}</p>
+                <p><strong>Score:</strong> ${score} / ${maxScore}</p>
+            `;
+
+            showModal(message);
+            updateChart();
+            updateComparison();
+
+            slide3.scrollIntoView({ behavior: 'smooth' });
+        }, 400);
+    });
+
+    // Add the generate PDF button to the DOM
+    generatePdfBtn.textContent = 'Generate PDF';
+    generatePdfBtn.addEventListener('click', generatePDF);
+    document.body.appendChild(generatePdfBtn);
+
+    function generatePDF() {
+        const doc = new jsPDF();
+
+        let y = 10;
+        const slides = [slide1, slide2];
+        slides.forEach(slide => {
+            const questions = slide.querySelectorAll('.question');
+            questions.forEach((question, index) => {
+                if (index % 2 === 0 && index !== 0) {
+                    y += 20; // Add space between rows
+                }
+
+                let x = (index % 2 === 0) ? 10 : 100; // Two columns
+                const questionText = question.querySelector('.question-number').textContent;
+                doc.text(`${questionText}`, x, y);
+
+                const options = question.querySelectorAll('.option-circle');
+                options.forEach(option => {
+                    const optionText = option.textContent;
+                    if (option.classList.contains('selected')) {
+                        const isCorrect = option.getAttribute('data-correct') === 'true';
+                        doc.setTextColor(isCorrect ? 'green' : 'red');
+                    } else {
+                        doc.setTextColor('black');
+                    }
+                    doc.text(`${optionText}`, x + 10, y + 10);
+                    y += 10;
+                });
+
+                y += 10; // Add space between questions
+                if (y > 280) { // Check if new page is needed
+                    doc.addPage();
+                    y = 10;
+                }
+            });
+        });
+
+        doc.save('questions.pdf');
+    }
+
+    // Other existing functions...
+}); 
       function updateTimer() {
         const currentTime = new Date();
         const elapsedTime = new Date(currentTime - startTime);
@@ -224,8 +292,8 @@
         return { score, maxScore };
       }
 
-      function displayResults(results, testName, score, maxScore) {
-    slide3.innerHTML = `<h3>Results for ${testName}</h3><p>Score: ${score} / ${maxScore}</p>`;
+      function displayResults(results,userName, testName, score, maxScore) {
+    slide3.innerHTML = `<h3>Dear ${userName} Results for ${testName}</h3><p>Score: ${score} / ${maxScore}</p>`;
     
     const table = document.createElement('table');
     const thead = document.createElement('thead');
@@ -286,7 +354,7 @@
 }
 
 function displayStoredResults(exam) {
-    slide3.innerHTML = `<h3>Results for ${exam.testName}</h3><p>Score: ${exam.score} / ${exam.maxScore}</p>`;
+    slide3.innerHTML = `<h3>Dear ${exam.userName} Results for ${exam.testName}</h3><p>Score: ${exam.score} / ${exam.maxScore}</p>`;
     
     const table = document.createElement('table');
     const thead = document.createElement('thead');
@@ -346,19 +414,65 @@ function displayStoredResults(exam) {
     slide3.insertBefore(resultBtn, slide3.firstChild);
 }
 
-      function saveResults(testName, results, score, maxScore) {
-        const examData = {
-          testName,
-          results,
-          score,
-          maxScore,
-          date: new Date().toISOString()
-        };
-        const exams = JSON.parse(localStorage.getItem('exams')) || [];
-        exams.push(examData);
-        localStorage.setItem('exams', JSON.stringify(exams));
-        displayExamList();
-      }
+      function saveResults(userName, testName, results, score, maxScore) {
+  const examData = {
+    userName,
+    testName,
+    results,
+    score,
+    maxScore,
+    date: new Date().toISOString()
+  };
+
+  // 1. Save to localStorage
+  const exams = JSON.parse(localStorage.getItem('exams')) || [];
+  exams.push(examData);
+  localStorage.setItem('exams', JSON.stringify(exams));
+
+  // 2. Save to Google Sheet
+  saveToGoogleSheet(examData);
+
+  // 3. Refresh exam list
+  displayExamList();
+}
+function saveToGoogleSheet(examData) {
+  const scriptURL = "https://script.google.com/macros/s/AKfycbyaxQ6loJbHO3sorO3UvwTuT-CtTj-03B4pq15K95jMA30VyUFucEKa9H8CMQ6QrO1a/exec"; // Replace with your Web App URL
+
+  const totalQuestions = examData.results.length;
+  const totalCorrect = examData.results.filter(r => r.correct).length;
+  const totalWrong = examData.results.filter(r => !r.correct && !r.missed).length;
+  const totalMissed = examData.results.filter(r => r.missed).length;
+
+  const payload = {
+    userName: examData.userName,
+    testName: examData.testName,
+    score: examData.score,
+    maxScore: examData.maxScore,
+    totalQuestions,
+    totalCorrect,
+    totalWrong,
+    totalMissed,
+    date: examData.date,
+    results: formatResultsString(examData.results)
+  };
+
+  fetch(scriptURL, {
+    method: 'POST',
+    body: new URLSearchParams(payload)
+  })
+  .then(response => console.log("Data saved to Google Sheet"))
+  .catch(error => console.error("Error saving to Google Sheet:", error));
+}
+
+ function formatResultsString(results) {
+  return results.map((res, index) => {
+    const qNum = index + 1;
+    const selected = res.missed ? "--" : res.selectedOption;
+    const correct = res.correctOption;
+    return `${qNum}:${selected}|${correct}`;
+  }).join(';');
+}
+
 
       function displayExamList() {
         const exams = JSON.parse(localStorage.getItem('exams')) || [];
@@ -529,7 +643,8 @@ function displayStoredResults(exam) {
           }
         });
       }
-      
+
+
       // Confirm refresh or page navigation
       window.addEventListener("beforeunload", function(event) {
         const isExamInProgress = startBtn.style.display === "none"; // Check if exam is ongoing
