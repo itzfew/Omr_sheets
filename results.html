@@ -194,56 +194,65 @@
     }
 
     async function generatePDF() {
-      const { jsPDF } = window.jspdf;
-      const doc = new jsPDF({ orientation: "landscape", unit: "pt", format: "a4" });
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF({ orientation: "landscape", unit: "pt", format: "a4" });
 
-      const res = await fetch(sheetCSV);
-      const text = await res.text();
-      const rows = text.trim().split("\n").slice(1);
-      let data = rows.map(row => row.split(","));
-      data.sort((a, b) => new Date(b[0]) - new Date(a[0]));
-      data = data.slice(0, 20);
+  const res = await fetch(sheetCSV);
+  const text = await res.text();
+  const rows = text.trim().split("\n").slice(1);
+  let data = rows.map(row => row.split(","));
+  data.sort((a, b) => new Date(b[0]) - new Date(a[0]));
+  data = data.slice(0, 20);
 
-      const tableData = data.map((row, index) => {
-        const [date, userName, testName, qNo, correct, wrong, missed, score, maxMarks] = row;
-        const percentage = ((score / maxMarks) * 100).toFixed(2);
-        let status = "";
-        if (percentage >= 90) status = "Topper ✪ ";
-        else if (percentage >= 80) status = "Excellent ≛";
-        else if (percentage >= 60) status = "Good ⋆ ";
-        else status = "Needs Improvement ✎ ";
+  const tableData = data.map((row, index) => {
+    const [date, userName, testName, qNo, correct, wrong, missed, score, maxMarks] = row;
+    const percentage = ((score / maxMarks) * 100).toFixed(2);
+    let status = "";
+    if (percentage >= 90) status = "Topper  ";
+    else if (percentage >= 80) status = "Excellent ";
+    else if (percentage >= 60) status = "Good  ";
+    else status = "Needs Improvement ";
 
-        return [
-          index + 1,
-          new Date(date).toLocaleDateString(),
-          userName,
-          `${score} / ${maxMarks}`,
-          `${percentage}%`,
-          status
-        ];
-      });
+    return [
+      index + 1,
+      new Date(date).toLocaleDateString(),
+      userName,
+      `${score} / ${maxMarks}`,
+      `${percentage}%`,
+      status
+    ];
+  });
 
-      doc.setFontSize(18);
-      doc.text("NEET Test Results (Top 20)", 40, 40);
+  doc.setFontSize(18);
+  doc.text("NEET Test Results (Top 20)", 40, 40);
 
-      doc.autoTable({
-        startY: 60,
-        head: [["S.No.", "Date", "Name", "Score / Max", "Percentage", "Status"]],
-        body: tableData,
-        styles: { fontSize: 10, cellPadding: 5, overflow: 'linebreak' },
-        headStyles: { fillColor: [40, 40, 40], textColor: 255, fontStyle: 'bold' },
-        alternateRowStyles: { fillColor: [240, 240, 240] },
-        margin: { left: 40, right: 40 },
-        tableWidth: 'auto'
-      });
+  doc.autoTable({
+    startY: 60,
+    head: [["S.No.", "Date", "Name", "Score / Max", "Percentage", "Status"]],
+    body: tableData,
+    styles: { fontSize: 10, cellPadding: 5, overflow: 'linebreak' },
+    headStyles: { fillColor: [40, 40, 40], textColor: 255, fontStyle: 'bold' },
+    alternateRowStyles: { fillColor: [240, 240, 240] },
+    margin: { left: 40, right: 40 },
+    tableWidth: 'auto'
+  });
 
-      doc.setFontSize(12);
-      doc.text("Dear Students, improve your score by attempting tests. Congratulations to all toppers!", 40, doc.internal.pageSize.height - 60);
-      doc.text("Visit: https://omrsheets.pages.dev/", 40, doc.internal.pageSize.height - 40);
-      doc.text("Contact: Telegram @NeetAspirantsBot", 40, doc.internal.pageSize.height - 20);
+  doc.setFontSize(12);
+  doc.text("Dear Students, improve your score by attempting tests. Congratulations to all toppers!", 40, doc.internal.pageSize.height - 60);
+  doc.text("Visit: https://omrsheets.pages.dev/", 40, doc.internal.pageSize.height - 40);
+  doc.text("Contact: Telegram @NeetAspirantsBot", 40, doc.internal.pageSize.height - 20);
 
-      doc.save("NEET_Test_Results.pdf");
-    }
+  // ⏳ Get today's date
+  const today = new Date();
+  const yyyy = today.getFullYear();
+  const mm = String(today.getMonth() + 1).padStart(2, '0');
+  const dd = String(today.getDate()).padStart(2, '0');
+  const formattedDate = `${yyyy}-${mm}-${dd}`;
+
+  // 💾 Save with dynamic name
+  doc.save(`NEET_Results_${formattedDate}.pdf`);
+}
+
 
     fetchSheet();
   </script>
