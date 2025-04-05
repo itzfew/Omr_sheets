@@ -122,7 +122,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
             slide3.scrollIntoView({ behavior: 'smooth' });
         }, 400);
-    });
+});
 
     // Add the generate PDF button to the DOM
     generatePdfBtn.textContent = 'Generate PDF';
@@ -170,7 +170,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // Other existing functions...
-}); 
+
       function updateTimer() {
         const currentTime = new Date();
         const elapsedTime = new Date(currentTime - startTime);
