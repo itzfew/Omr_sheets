@@ -579,7 +579,13 @@ function saveToGoogleSheet(examData) {
           }
         });
       }
-      
+      function handleSubmit() {
+    // Hide the submit button
+    document.getElementById("submitBtn").style.display = "none";
+
+    // (Optional) You can continue with your form submission logic here
+    // e.g., send data to Google Sheets or API
+  } 
       // Confirm refresh or page navigation
       window.addEventListener("beforeunload", function(event) {
         const isExamInProgress = startBtn.style.display === "none"; // Check if exam is ongoing
