@@ -208,10 +208,10 @@
         const [date, userName, testName, qNo, correct, wrong, missed, score, maxMarks] = row;
         const percentage = ((score / maxMarks) * 100).toFixed(2);
         let status = "";
-        if (percentage >= 90) status = "Topper 🌟";
-        else if (percentage >= 80) status = "Excellent ✅";
-        else if (percentage >= 60) status = "Good 🙂";
-        else status = "Needs Improvement ⚠️";
+        if (percentage >= 90) status = "Topper ✪ ";
+        else if (percentage >= 80) status = "Excellent ≛";
+        else if (percentage >= 60) status = "Good ⋆ ";
+        else status = "Needs Improvement ✎ ";
 
         return [
           index + 1,
