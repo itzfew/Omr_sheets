@@ -160,6 +160,51 @@
   </div>
 
   <div class="comparison-container" id="comparisonResults"></div>
+  <script>
+    // JavaScript to handle button loop behavior and responsive visibility
+
+const topElements = document.querySelectorAll('.top-bar-item');
+let currentTopIndex = 0;
+
+function loopTopItems() {
+  topElements.forEach((el, idx) => {
+    el.style.display = idx === currentTopIndex ? 'flex' : 'none';
+  });
+
+  currentTopIndex = (currentTopIndex + 1) % topElements.length;
+}
+
+// Start loop every 5 seconds\setInterval(loopTopItems, 5000);
+loopTopItems();
+
+// Responsive behavior for button text hiding
+function updateButtonTextVisibility() {
+  const width = window.innerWidth;
+  document.querySelectorAll('.avg-score-btn i').forEach((icon, index) => {
+    const text = icon.nextSibling;
+    if (text && text.nodeType === 3) {
+      icon.parentNode.removeChild(text);
+    }
+  });
+
+  document.querySelectorAll('.avg-score-btn').forEach(button => {
+    if (window.innerWidth < 500) {
+      const textNodes = Array.from(button.childNodes).filter(n => n.nodeType === 3);
+      textNodes.forEach(n => button.removeChild(n));
+    } else {
+      if (!button.textContent.includes('Calculate Final Exam Score')) {
+        button.innerHTML = '<i class="fa fa-bullseye"></i> Calculate Final Exam Score';
+      }
+      if (!button.textContent.includes('Top Users')) {
+        button.innerHTML = '<i class="fa fa-trophy"></i> Top Users';
+      }
+    }
+  });
+}
+
+window.addEventListener('resize', updateButtonTextVisibility);
+document.addEventListener('DOMContentLoaded', updateButtonTextVisibility);
+  </script>
   <script src="js/script.js"></script>
 </body>
 </html>
