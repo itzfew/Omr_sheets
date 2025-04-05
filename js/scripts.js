@@ -614,71 +614,77 @@ async function generatePDF(exam) {
   doc.text(`Score: ${exam.score} / ${exam.maxScore}`, 10, y);
   y += 10;
 
-  const col1 = [], col2 = [];
+  const columns = [[], []];
+  let colIndex = 0, count = 0;
 
   exam.results.forEach((res, index) => {
-    const questionIndex = index + 1;
-    const block = [`Q${questionIndex}`];
-    ['A', 'B', 'C', 'D'].forEach(opt => {
-      const isSelected = res.selectedOption === opt;
+    const qLabel = `Q${index + 1}`;
+
+    const optionRow = ['A', 'B', 'C', 'D'].map((opt) => {
       const isCorrect = res.correctOption === opt;
+      const isSelected = res.selectedOption === opt;
 
-      let text = opt;
-      let style = 'normal';
-      let color = [0, 0, 0];
-
-      if (res.missed) {
-        if (isCorrect) {
-          color = [0, 128, 0]; // Green for correct even if missed
-        } else {
-          color = [0, 0, 0]; // Black for missed
-        }
-      } else if (isSelected && isCorrect) {
-        style = 'bold';
-        color = [0, 128, 0]; // Green
-      } else if (isSelected && !isCorrect) {
-        style = 'bold';
-        color = [255, 0, 0]; // Red
-      } else if (isCorrect) {
-        style = 'italic';
-        color = [0, 128, 0]; // Green for correct
+      let color = [0, 0, 0]; // black
+      if (isCorrect) {
+        color = [0, 128, 0]; // green
+      } else if (isSelected) {
+        color = [255, 0, 0]; // red
       }
 
-      block.push({ content: text, styles: { textColor: color, fontStyle: style } });
+      return {
+        content: `◯ ${opt}`,
+        styles: {
+          textColor: color,
+          fontStyle: isSelected ? 'bold' : 'normal'
+        }
+      };
     });
 
-    // Push to left or right column
-    (index % 2 === 0 ? col1 : col2).push(block);
+    const block = [
+      { content: qLabel, colSpan: 4, styles: { fontStyle: 'bold' } },
+      ...optionRow
+    ];
+
+    columns[colIndex].push(block);
+    count++;
+    if (count === 5) {
+      colIndex++;
+      count = 0;
+    }
   });
 
-  // Merge both columns row-wise
-  const finalRows = [];
-  const maxLength = Math.max(col1.length, col2.length);
-  for (let i = 0; i < maxLength; i++) {
-    const left = col1[i] || ['', '', '', '', ''];
-    const right = col2[i] || ['', '', '', '', ''];
-    finalRows.push([...left, '', ...right]);
+  const tableRows = [];
+  const maxRows = Math.max(columns[0].length, columns[1].length);
+  for (let i = 0; i < maxRows; i++) {
+    const left = columns[0][i] || [
+      { content: '', colSpan: 4 },
+      { content: '' }, { content: '' }, { content: '' }, { content: '' }
+    ];
+    const right = columns[1][i] || [
+      { content: '', colSpan: 4 },
+      { content: '' }, { content: '' }, { content: '' }, { content: '' }
+    ];
+    tableRows.push([...left, { content: '' }, ...right]);
   }
 
   doc.autoTable({
     startY: y,
-    head: [['Q', 'A', 'B', 'C', 'D', '', 'Q', 'A', 'B', 'C', 'D']],
-    body: finalRows,
-    styles: {
-      cellPadding: 2,
-      fontSize: 10,
-      valign: 'middle',
-    },
+    head: [[
+      { content: 'Q', colSpan: 1 },
+      { content: 'A' }, { content: 'B' }, { content: 'C' }, { content: 'D' },
+      { content: '' },
+      { content: 'Q' }, { content: 'A' }, { content: 'B' }, { content: 'C' }, { content: 'D' },
+    ]],
+    body: tableRows,
+    styles: { fontSize: 10, cellPadding: 1 },
     columnStyles: {
-      0: { cellWidth: 10 }, 5: { cellWidth: 5 },
-      6: { cellWidth: 10 }
+      0: { cellWidth: 8 }, 5: { cellWidth: 5 }, 6: { cellWidth: 8 }
     }
   });
 
   doc.save(`${exam.userName}_${exam.testName}_results.pdf`);
 }
  
-
       // Confirm refresh or page navigation
       window.addEventListener("beforeunload", function(event) {
         const isExamInProgress = startBtn.style.display === "none"; // Check if exam is ongoing
