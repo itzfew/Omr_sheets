@@ -13,8 +13,12 @@
       padding: 0;
     }
 
-    .top-bar {
-      display: flex;
+    .top-wrapper {
+      position: relative;
+    }
+
+    .top-bar-item {
+      display: none;
       flex-wrap: nowrap;
       justify-content: space-between;
       align-items: center;
@@ -26,12 +30,16 @@
       box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2);
     }
 
-    .top-bar a {
+    .top-bar-item.visible {
+      display: flex;
+    }
+
+    .top-bar-item a {
       color: white;
       text-decoration: none;
     }
 
-    .top-bar a:hover {
+    .top-bar-item a:hover {
       text-decoration: underline;
     }
 
@@ -109,18 +117,23 @@
   </style>
 </head>
 <body>
-  <div class="top-bar">
-    <div class="news-badge">NEW</div>
-    <div>
-      <a href="https://omrsheets.pages.dev/js/VID_20250403_232955_569.mp4" target="_blank">🚀 How to use this site? <b>Watch Now</b></a>
+  <div class="top-wrapper">
+    <div class="top-bar-item visible">
+      <div class="news-badge">NEW</div>
+      <div>
+        <a href="https://omrsheets.pages.dev/js/VID_20250403_232955_569.mp4" target="_blank">🚀 How to use this site? <b>Watch Now</b></a>
+      </div>
     </div>
-    <div class="button-container">
-      <button id="avgScoreBtn" class="button avg-score-btn">
-        <i class="fa fa-bullseye"></i> <span>Final Score</span>
-      </button>
-      <button id="topUsersBtn" class="button avg-score-btn" onclick="window.location.href='results.html'">
-        <i class="fa fa-trophy"></i> <span>Top Users</span>
-      </button>
+    <div class="top-bar-item">
+      <div class="news-badge">NEW</div>
+      <div class="button-container">
+        <button id="avgScoreBtn" class="button avg-score-btn">
+          <i class="fa fa-bullseye"></i> <span>Final Score</span>
+        </button>
+        <button id="topUsersBtn" class="button avg-score-btn" onclick="window.location.href='results.html'">
+          <i class="fa fa-trophy"></i> <span>Top Users</span>
+        </button>
+      </div>
     </div>
   </div>
 
@@ -160,50 +173,35 @@
   </div>
 
   <div class="comparison-container" id="comparisonResults"></div>
+
   <script>
-    // JavaScript to handle button loop behavior and responsive visibility
+    const topElements = document.querySelectorAll('.top-bar-item');
+    let currentTopIndex = 0;
 
-const topElements = document.querySelectorAll('.top-bar-item');
-let currentTopIndex = 0;
-
-function loopTopItems() {
-  topElements.forEach((el, idx) => {
-    el.style.display = idx === currentTopIndex ? 'flex' : 'none';
-  });
-
-  currentTopIndex = (currentTopIndex + 1) % topElements.length;
-}
-
-// Start loop every 5 seconds\setInterval(loopTopItems, 5000);
-loopTopItems();
-
-// Responsive behavior for button text hiding
-function updateButtonTextVisibility() {
-  const width = window.innerWidth;
-  document.querySelectorAll('.avg-score-btn i').forEach((icon, index) => {
-    const text = icon.nextSibling;
-    if (text && text.nodeType === 3) {
-      icon.parentNode.removeChild(text);
+    function loopTopItems() {
+      topElements.forEach((el, idx) => {
+        el.classList.remove('visible');
+      });
+      topElements[currentTopIndex].classList.add('visible');
+      currentTopIndex = (currentTopIndex + 1) % topElements.length;
     }
-  });
 
-  document.querySelectorAll('.avg-score-btn').forEach(button => {
-    if (window.innerWidth < 500) {
-      const textNodes = Array.from(button.childNodes).filter(n => n.nodeType === 3);
-      textNodes.forEach(n => button.removeChild(n));
-    } else {
-      if (!button.textContent.includes('Calculate Final Exam Score')) {
-        button.innerHTML = '<i class="fa fa-bullseye"></i> Calculate Final Exam Score';
-      }
-      if (!button.textContent.includes('Top Users')) {
-        button.innerHTML = '<i class="fa fa-trophy"></i> Top Users';
-      }
+    setInterval(loopTopItems, 5000);
+    loopTopItems();
+
+    function updateButtonTextVisibility() {
+      const width = window.innerWidth;
+      document.querySelectorAll('.avg-score-btn').forEach(button => {
+        if (width < 500) {
+          button.querySelector('span')?.classList.add('hidden');
+        } else {
+          button.querySelector('span')?.classList.remove('hidden');
+        }
+      });
     }
-  });
-}
 
-window.addEventListener('resize', updateButtonTextVisibility);
-document.addEventListener('DOMContentLoaded', updateButtonTextVisibility);
+    window.addEventListener('resize', updateButtonTextVisibility);
+    document.addEventListener('DOMContentLoaded', updateButtonTextVisibility);
   </script>
   <script src="js/script.js"></script>
 </body>
