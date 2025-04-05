@@ -654,7 +654,7 @@ async function generatePDF(exam) {
       const isCorrect = res.correctOption === opt;
       const missed = res.missed;
 
-      let color = [0, 0, 0]; // default black
+      let color = [f, f, f]; // default white
 
       if (missed) {
         if (isCorrect) color = [0, 128, 0]; // green
@@ -673,8 +673,8 @@ async function generatePDF(exam) {
       doc.circle(cx, y + 5, circleRadius, 'F');
 
       // Draw option letter inside circle
-      doc.setTextColor(255, 255, 255);
-      doc.setFontSize(8);
+      doc.setTextColor(0, 0, 0);
+      doc.setFontSize(12);
       doc.setFont(undefined, 'bold');
       doc.text(opt.toLowerCase(), cx - 1.5, y + 5.5);
 
