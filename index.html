@@ -90,10 +90,6 @@
       .button-container {
         gap: 3px;
       }
-
-      .score-button span {
-        display: none;
-      }
     }
 
     .modal {
@@ -198,16 +194,7 @@
     setInterval(loopTopItems, 5000);
     loopTopItems();
 
-    function updateButtonTextVisibility() {
-      const width = window.innerWidth;
-      document.querySelectorAll('.score-button').forEach(button => {
-        const span = button.querySelector('span');
-        if (span) span.style.display = width < 500 ? 'none' : 'inline';
-      });
-    }
-
-    window.addEventListener('resize', updateButtonTextVisibility);
-    document.addEventListener('DOMContentLoaded', updateButtonTextVisibility);
+    
   </script>
   <script src="js/script.js"></script>
 </body>
