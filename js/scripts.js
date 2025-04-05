@@ -604,85 +604,101 @@ function saveToGoogleSheet(examData) {
 async function generatePDF(exam) {
   const { jsPDF } = window.jspdf;
   const doc = new jsPDF('p', 'mm', 'a4');
-  const cellHeight = 10;
-  const boxPadding = 2;
-  const circleRadius = 3;
-  let y = 10;
+  const pageWidth = doc.internal.pageSize.getWidth();
+
+  const blockWidth = 45; // Width of each question block
+  const blockHeight = 12;
+  const marginX = 10;
+  const marginY = 15;
+  const gapX = 5;
+  const gapY = 5;
+  const circleRadius = 4;
 
   doc.setFontSize(14);
-  doc.text(`Results for ${exam.userName} - ${exam.testName}`, 10, y);
-  y += 10;
+  doc.text(`Results for ${exam.userName} - ${exam.testName}`, marginX, marginY - 5);
   doc.setFontSize(12);
-  doc.text(`Score: ${exam.score} / ${exam.maxScore}`, 10, y);
-  y += 10;
+  doc.text(`Score: ${exam.score} / ${exam.maxScore}`, marginX, marginY + 2);
 
-  for (let i = 0; i < exam.results.length; i += 10) {
-    const group = exam.results.slice(i, i + 10);
-    const left5 = group.slice(0, 5);
-    const right5 = group.slice(5, 10);
-    const startY = y;
+  const blocksPerRow = Math.floor((pageWidth - marginX * 2 + gapX) / (blockWidth + gapX));
+  let x = marginX;
+  let y = marginY + 10;
 
-    for (let j = 0; j < 5; j++) {
-      drawQuestionBlock(doc, left5[j], i + j, 10, y);
-      drawQuestionBlock(doc, right5[j], i + j + 5, 105, y);
-      y += cellHeight;
+  for (let i = 0; i < exam.results.length; i++) {
+    drawQuestionBlock(doc, exam.results[i], i + 1, x, y, blockWidth, blockHeight, circleRadius);
+    x += blockWidth + gapX;
+
+    if ((i + 1) % blocksPerRow === 0) {
+      x = marginX;
+      y += blockHeight + gapY;
     }
 
-    // Draw box around left and right 5 questions
-    doc.setDrawColor(0);
-    doc.setLineWidth(0.5);
-    doc.rect(10 - boxPadding, startY - boxPadding, 90 + boxPadding * 2, 5 * cellHeight + boxPadding * 2);
-    doc.rect(105 - boxPadding, startY - boxPadding, 90 + boxPadding * 2, 5 * cellHeight + boxPadding * 2);
+    if (y > 280) { // avoid overflow
+      doc.addPage();
+      y = marginY;
+      x = marginX;
+    }
   }
 
   doc.save(`${exam.userName}_${exam.testName}_results.pdf`);
 
-  function drawQuestionBlock(doc, res, qIndex, x, y) {
-    if (!res) return;
+  function drawQuestionBlock(doc, res, qNum, x, y, width, height, r) {
+    doc.setDrawColor(0);
+    doc.setLineWidth(0.5);
+    doc.rect(x, y, width, height); // outer box
 
     doc.setFontSize(10);
-    doc.setTextColor(0, 0, 0);
     doc.setFont(undefined, 'bold');
-    doc.text(`Q${qIndex + 1}`, x, y + 5);
+    doc.setTextColor(0, 0, 0);
+    doc.text(`Q${qNum}`, x + 2, y + 5);
 
     const options = ['A', 'B', 'C', 'D'];
-    const optionGap = 15;
-    let cx = x + 20;
+    const startX = x + 20;
+    const centerY = y + height / 2;
 
-    options.forEach(opt => {
+    options.forEach((opt, idx) => {
+      const cx = startX + idx * 10;
+
+      let fill = [255, 255, 255]; // default white
+      let stroke = [0, 0, 0];     // black border
+      let textColor = [0, 0, 0];
+      let fontStyle = 'normal';
+
       const isSelected = res.selectedOption === opt;
       const isCorrect = res.correctOption === opt;
       const missed = res.missed;
 
-      let color = [0, 0, 0]; // default black
-
       if (missed) {
-        if (isCorrect) color = [0, 128, 0]; // green
-        else color = [255, 204, 0]; // yellow for unselected
+        if (isCorrect) {
+          fill = [0, 128, 0]; // green
+          textColor = [255, 255, 255];
+        } else {
+          stroke = [255, 204, 0]; // yellow border
+        }
       } else if (isSelected && isCorrect) {
-        color = [0, 128, 0]; // green
+        fill = [0, 128, 0];
+        textColor = [255, 255, 255];
+        fontStyle = 'bold';
       } else if (isSelected && !isCorrect) {
-        color = [255, 0, 0]; // red
+        fill = [255, 0, 0];
+        textColor = [255, 255, 255];
+        fontStyle = 'bold';
       } else if (isCorrect) {
-        color = [0, 128, 0]; // green
+        fill = [0, 128, 0];
+        textColor = [255, 255, 255];
+        fontStyle = 'italic';
       }
 
-      // Draw colored circle
-      doc.setDrawColor(...color);
-      doc.setFillColor(...color);
-      doc.circle(cx, y + 5, circleRadius, 'F');
+      doc.setFillColor(...fill);
+      doc.setDrawColor(...stroke);
+      doc.circle(cx, centerY, r, 'FD');
 
-      // Draw option letter inside circle
-      doc.setTextColor(255, 255, 255);
       doc.setFontSize(8);
-      doc.setFont(undefined, 'bold');
-      doc.text(opt.toLowerCase(), cx - 1.5, y + 5.5);
-
-      cx += optionGap;
+      doc.setTextColor(...textColor);
+      doc.setFont(undefined, fontStyle);
+      doc.text(opt.toLowerCase(), cx - 1.5, centerY + 2);
     });
   }
 }
- 
  
     // Confirm refresh or page navigation
       window.addEventListener("beforeunload", function(event) {
