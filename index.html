@@ -120,6 +120,32 @@
       font-size: 20px;
       cursor: pointer;
     }
+    .tele-button {
+  padding: 6px 12px;
+  font-size: 14px;
+  font-weight: bold;
+  background: linear-gradient(145deg, #007bff, #0056b3);
+  color: white;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+  box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.3),
+              inset -2px -2px 5px rgba(255, 255, 255, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-width: 160px;
+  text-decoration: none;
+  white-space: nowrap;
+}
+.tele-button:hover {
+  transform: scale(1.03);
+  box-shadow: 6px 6px 15px rgba(0, 0, 0, 0.35),
+              inset -3px -3px 6px rgba(255, 255, 255, 0.25);
+}
+
   </style>
 </head>
 <body>
@@ -145,7 +171,14 @@
     </div>
   </div>
 
-  <h3>OMR Checking</h3>
+  <div style="display: flex; align-items: center; gap: 15px; flex-wrap: wrap;">
+  <h3 style="margin: 0;">OMR Checking</h3>
+  <a href="https://t.me/NEETJEECHANNEL" target="_blank" class="tele-button">
+    <i class="fa fa-paper-plane"></i> Telegram
+  </a>
+</div>
+
+  
   <label for="userName">User Name:</label>
   <input type="text" id="userName" class="input" placeholder="Enter your name" />
   <label for="testName">Test Name:</label>
