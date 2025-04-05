@@ -78,7 +78,7 @@
   const userConfirmed = confirm("Are you sure you want to submit your answers?");
   if (!userConfirmed) return;
 
-  // Disable and animate the submit button
+  // Disable and show spinner
   submitBtn.disabled = true;
   submitBtn.innerHTML = `<i class="fa fa-spinner fa-spin"></i> Submitting...`;
 
@@ -94,7 +94,7 @@
     displayResults(results, userName, testName, score, maxScore);
     saveResults(userName, testName, results, score, maxScore);
 
-    // Hide buttons
+    // ✅ Hide buttons after processing
     submitBtn.style.display = "none";
     prevBtn.style.display = "none";
     resultBtn.style.display = "block";
@@ -102,26 +102,24 @@
     clearInterval(timerInterval);
     timerElement.style.display = "none";
 
-    // Prepare modal message
     const correctCount = results.filter(result => result.correct).length;
     const incorrectCount = results.filter(result => !result.correct && !result.missed).length;
     const missedCount = results.filter(result => result.missed).length;
 
     const message = `
-      <p><strong><i class="fa fa-question-circle"></i> Total Questions:</strong> ${answers1.length}</p>
-      <p><strong><i class="fa fa-check-circle" style="color:green;"></i> Correct:</strong> ${correctCount}</p>
-      <p><strong><i class="fa fa-times-circle" style="color:red;"></i> Incorrect:</strong> ${incorrectCount}</p>
-      <p><strong><i class="fa fa-ban" style="color:orange;"></i> Missed:</strong> ${missedCount}</p>
-      <p><strong><i class="fa fa-star"></i> Score:</strong> ${score} / ${maxScore}</p>
+      <p><strong>Total Questions:</strong> ${answers1.length}</p>
+      <p><strong>Correct:</strong> ${correctCount}</p>
+      <p><strong>Incorrect:</strong> ${incorrectCount}</p>
+      <p><strong>Missed:</strong> ${missedCount}</p>
+      <p><strong>Score:</strong> ${score} / ${maxScore}</p>
     `;
 
     showModal(message);
     updateChart();
     updateComparison();
 
-    // Smooth scroll to results
     slide3.scrollIntoView({ behavior: 'smooth' });
-  }, 500); // Delay for spinner (optional)
+  }, 400);
 });
 
 
