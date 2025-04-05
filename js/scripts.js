@@ -304,14 +304,14 @@
     slide3.insertBefore(resultBtn, slide3.firstChild);
 }
 
-function displayStoredResults(exam) {
-    slide3.innerHTML = `<h3>Dear ${exam.userName} Results for ${exam.testName}</h3><p>Score: ${exam.score} / ${exam.maxScore}</p>`;
-    
+async function displayStoredResults(exam) {
+    slide3.innerHTML = `<h3>Dear ${exam.userName}, Results for ${exam.testName}</h3><p>Score: ${exam.score} / ${exam.maxScore}</p>`;
+
     const table = document.createElement('table');
+    table.setAttribute('id', 'resultsTable');
     const thead = document.createElement('thead');
     const tbody = document.createElement('tbody');
 
-    // Create table headers
     const headers = ['Question Number', 'Selected Option', 'Correct Option', 'Result'];
     const headerRow = document.createElement('tr');
     headers.forEach(headerText => {
@@ -354,17 +354,24 @@ function displayStoredResults(exam) {
             resultCell.style.color = 'white';
         }
         row.appendChild(resultCell);
-
         tbody.appendChild(row);
     });
 
     table.appendChild(thead);
     table.appendChild(tbody);
     slide3.appendChild(table);
+
+    // Add PDF Button
+    const pdfBtn = document.createElement('button');
+    pdfBtn.textContent = 'Download PDF';
+    pdfBtn.style.marginTop = '10px';
+    pdfBtn.onclick = () => generatePDF(exam);
+    slide3.appendChild(pdfBtn);
+
     slide3.style.display = "block";
     slide3.insertBefore(resultBtn, slide3.firstChild);
 }
-
+ 
       function saveResults(userName, testName, results, score, maxScore) {
   const examData = {
     userName,
@@ -595,7 +602,42 @@ function saveToGoogleSheet(examData) {
         });
       }
 
+async function generatePDF(exam) {
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF();
 
+    doc.setFontSize(16);
+    doc.text(`Results for ${exam.userName} - ${exam.testName}`, 10, 10);
+    doc.setFontSize(12);
+    doc.text(`Score: ${exam.score} / ${exam.maxScore}`, 10, 20);
+
+    let startY = 30;
+
+    // Table Headers
+    const headers = [["Q.No", "Selected", "Correct", "Result"]];
+    const rows = exam.results.map(result => [
+        result.question,
+        result.selectedOption || "—",
+        result.correctOption,
+        result.missed ? "Missed" : (result.correct ? "Correct" : "Incorrect")
+    ]);
+
+    // Add AutoTable Plugin
+    doc.autoTable({
+        head: headers,
+        body: rows,
+        startY: startY,
+        styles: {
+            fontSize: 10,
+            cellPadding: 3
+        },
+        headStyles: { fillColor: [22, 160, 133] }, // teal
+        alternateRowStyles: { fillColor: [240, 240, 240] }
+    });
+
+    doc.save(`Result_${exam.testName}_${exam.userName}.pdf`);
+}
+ 
       // Confirm refresh or page navigation
       window.addEventListener("beforeunload", function(event) {
         const isExamInProgress = startBtn.style.display === "none"; // Check if exam is ongoing
