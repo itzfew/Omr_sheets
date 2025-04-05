@@ -604,101 +604,108 @@ function saveToGoogleSheet(examData) {
 async function generatePDF(exam) {
   const { jsPDF } = window.jspdf;
   const doc = new jsPDF('p', 'mm', 'a4');
-  const pageWidth = doc.internal.pageSize.getWidth();
-
-  const blockWidth = 45; // Width of each question block
-  const blockHeight = 12;
   const marginX = 10;
   const marginY = 15;
-  const gapX = 5;
-  const gapY = 5;
   const circleRadius = 4;
+  const boxHeight = 30;
+  const boxWidth = 90;
+  const gapX = 10;
+  const gapY = 10;
 
   doc.setFontSize(14);
-  doc.text(`Results for ${exam.userName} - ${exam.testName}`, marginX, marginY - 5);
+  doc.text(`Results for ${exam.userName} - ${exam.testName}`, marginX, 10);
   doc.setFontSize(12);
-  doc.text(`Score: ${exam.score} / ${exam.maxScore}`, marginX, marginY + 2);
+  doc.text(`Score: ${exam.score} / ${exam.maxScore}`, marginX, 18);
 
-  const blocksPerRow = Math.floor((pageWidth - marginX * 2 + gapX) / (blockWidth + gapX));
   let x = marginX;
-  let y = marginY + 10;
+  let y = 25;
+  let questionCounter = 0;
 
-  for (let i = 0; i < exam.results.length; i++) {
-    drawQuestionBlock(doc, exam.results[i], i + 1, x, y, blockWidth, blockHeight, circleRadius);
-    x += blockWidth + gapX;
+  for (let i = 0; i < exam.results.length; i += 5) {
+    const block = exam.results.slice(i, i + 5);
+    drawQuestionBox(doc, block, i + 1, x, y, boxWidth, boxHeight, circleRadius);
+    x += boxWidth + gapX;
 
-    if ((i + 1) % blocksPerRow === 0) {
+    if (x + boxWidth > 200) {
       x = marginX;
-      y += blockHeight + gapY;
+      y += boxHeight + gapY;
     }
 
-    if (y > 280) { // avoid overflow
+    if (y + boxHeight > 280) {
       doc.addPage();
-      y = marginY;
       x = marginX;
+      y = marginY;
     }
   }
 
   doc.save(`${exam.userName}_${exam.testName}_results.pdf`);
 
-  function drawQuestionBlock(doc, res, qNum, x, y, width, height, r) {
+  function drawQuestionBox(doc, block, qStartIndex, x, y, width, height, r) {
     doc.setDrawColor(0);
     doc.setLineWidth(0.5);
-    doc.rect(x, y, width, height); // outer box
+    doc.rect(x, y, width, height); // box border
 
-    doc.setFontSize(10);
-    doc.setFont(undefined, 'bold');
-    doc.setTextColor(0, 0, 0);
-    doc.text(`Q${qNum}`, x + 2, y + 5);
+    const rowHeight = height / 5;
 
-    const options = ['A', 'B', 'C', 'D'];
-    const startX = x + 20;
-    const centerY = y + height / 2;
+    block.forEach((res, index) => {
+      const qNum = qStartIndex + index;
+      const rowY = y + index * rowHeight + rowHeight / 2;
 
-    options.forEach((opt, idx) => {
-      const cx = startX + idx * 10;
+      doc.setFontSize(9);
+      doc.setTextColor(0, 0, 0);
+      doc.setFont(undefined, 'bold');
+      doc.text(`Q${qNum}`, x + 3, rowY + 1.5);
 
-      let fill = [255, 255, 255]; // default white
-      let stroke = [0, 0, 0];     // black border
-      let textColor = [0, 0, 0];
-      let fontStyle = 'normal';
+      const options = ['A', 'B', 'C', 'D'];
+      const optionStartX = x + 20;
+      const spacing = 14;
 
-      const isSelected = res.selectedOption === opt;
-      const isCorrect = res.correctOption === opt;
-      const missed = res.missed;
+      options.forEach((opt, optIdx) => {
+        const cx = optionStartX + optIdx * spacing;
 
-      if (missed) {
-        if (isCorrect) {
-          fill = [0, 128, 0]; // green
+        let fill = [255, 255, 255];
+        let stroke = [0, 0, 0];
+        let textColor = [0, 0, 0];
+        let fontStyle = 'normal';
+
+        const isSelected = res.selectedOption === opt;
+        const isCorrect = res.correctOption === opt;
+        const missed = res.missed;
+
+        if (missed) {
+          if (isCorrect) {
+            fill = [0, 128, 0];
+            textColor = [255, 255, 255];
+          } else {
+            stroke = [255, 204, 0];
+          }
+        } else if (isSelected && isCorrect) {
+          fill = [0, 128, 0];
           textColor = [255, 255, 255];
-        } else {
-          stroke = [255, 204, 0]; // yellow border
+          fontStyle = 'bold';
+        } else if (isSelected && !isCorrect) {
+          fill = [255, 0, 0];
+          textColor = [255, 255, 255];
+          fontStyle = 'bold';
+        } else if (isCorrect) {
+          fill = [0, 128, 0];
+          textColor = [255, 255, 255];
+          fontStyle = 'italic';
         }
-      } else if (isSelected && isCorrect) {
-        fill = [0, 128, 0];
-        textColor = [255, 255, 255];
-        fontStyle = 'bold';
-      } else if (isSelected && !isCorrect) {
-        fill = [255, 0, 0];
-        textColor = [255, 255, 255];
-        fontStyle = 'bold';
-      } else if (isCorrect) {
-        fill = [0, 128, 0];
-        textColor = [255, 255, 255];
-        fontStyle = 'italic';
-      }
 
-      doc.setFillColor(...fill);
-      doc.setDrawColor(...stroke);
-      doc.circle(cx, centerY, r, 'FD');
+        doc.setDrawColor(...stroke);
+        doc.setFillColor(...fill);
+        doc.circle(cx, rowY, r, 'FD');
 
-      doc.setFontSize(8);
-      doc.setTextColor(...textColor);
-      doc.setFont(undefined, fontStyle);
-      doc.text(opt.toLowerCase(), cx - 1.5, centerY + 2);
+        doc.setTextColor(...textColor);
+        doc.setFont(undefined, fontStyle);
+        doc.setFontSize(7);
+        doc.text(opt.toLowerCase(), cx - 1.5, rowY + 2.2);
+      });
     });
   }
 }
+ 
  
     // Confirm refresh or page navigation
       window.addEventListener("beforeunload", function(event) {
