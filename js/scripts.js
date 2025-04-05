@@ -648,7 +648,7 @@ async function generatePDF(exam) {
   function formatQuestionBlock(res, qIndex) {
     if (!res) return ['', '', '', '', '']; // filler for empty cells
 
-    const block = [`Q${qIndex + 1}`];
+    const block = [`${qIndex + 1}`];
 
     ['A', 'B', 'C', 'D'].forEach(opt => {
       const isSelected = res.selectedOption === opt;
