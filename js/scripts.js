@@ -604,104 +604,81 @@ function saveToGoogleSheet(examData) {
 async function generatePDF(exam) {
   const { jsPDF } = window.jspdf;
   const doc = new jsPDF('p', 'mm', 'a4');
-  const marginX = 10;
-  const marginY = 15;
-  const circleRadius = 4;
-  const boxHeight = 30;
-  const boxWidth = 90;
-  const gapX = 10;
-  const gapY = 10;
+  const cellHeight = 10;
+  const boxPadding = 2;
+  const circleRadius = 3;
+  let y = 10;
 
   doc.setFontSize(14);
-  doc.text(`Results for ${exam.userName} - ${exam.testName}`, marginX, 10);
+  doc.text(`Results for ${exam.userName} - ${exam.testName}`, 10, y);
+  y += 10;
   doc.setFontSize(12);
-  doc.text(`Score: ${exam.score} / ${exam.maxScore}`, marginX, 18);
+  doc.text(`Score: ${exam.score} / ${exam.maxScore}`, 10, y);
+  y += 10;
 
-  let x = marginX;
-  let y = 25;
-  let questionCounter = 0;
+  for (let i = 0; i < exam.results.length; i += 10) {
+    const group = exam.results.slice(i, i + 10);
+    const left5 = group.slice(0, 5);
+    const right5 = group.slice(5, 10);
+    const startY = y;
 
-  for (let i = 0; i < exam.results.length; i += 5) {
-    const block = exam.results.slice(i, i + 5);
-    drawQuestionBox(doc, block, i + 1, x, y, boxWidth, boxHeight, circleRadius);
-    x += boxWidth + gapX;
-
-    if (x + boxWidth > 200) {
-      x = marginX;
-      y += boxHeight + gapY;
+    for (let j = 0; j < 5; j++) {
+      drawQuestionBlock(doc, left5[j], i + j, 10, y);
+      drawQuestionBlock(doc, right5[j], i + j + 5, 105, y);
+      y += cellHeight;
     }
 
-    if (y + boxHeight > 280) {
-      doc.addPage();
-      x = marginX;
-      y = marginY;
-    }
+    // Draw box around left and right 5 questions
+    doc.setDrawColor(0);
+    doc.setLineWidth(0.5);
+    doc.rect(10 - boxPadding, startY - boxPadding, 90 + boxPadding * 2, 5 * cellHeight + boxPadding * 2);
+    doc.rect(105 - boxPadding, startY - boxPadding, 90 + boxPadding * 2, 5 * cellHeight + boxPadding * 2);
   }
 
   doc.save(`${exam.userName}_${exam.testName}_results.pdf`);
 
-  function drawQuestionBox(doc, block, qStartIndex, x, y, width, height, r) {
-    doc.setDrawColor(0);
-    doc.setLineWidth(0.5);
-    doc.rect(x, y, width, height); // box border
+  function drawQuestionBlock(doc, res, qIndex, x, y) {
+    if (!res) return;
 
-    const rowHeight = height / 5;
+    doc.setFontSize(10);
+    doc.setTextColor(0, 0, 0);
+    doc.setFont(undefined, 'bold');
+    doc.text(`Q${qIndex + 1}`, x, y + 5);
 
-    block.forEach((res, index) => {
-      const qNum = qStartIndex + index;
-      const rowY = y + index * rowHeight + rowHeight / 2;
+    const options = ['A', 'B', 'C', 'D'];
+    const optionGap = 15;
+    let cx = x + 20;
 
-      doc.setFontSize(9);
+    options.forEach(opt => {
+      const isSelected = res.selectedOption === opt;
+      const isCorrect = res.correctOption === opt;
+      const missed = res.missed;
+
+      let color = [f, f, f]; // default white
+
+      if (missed) {
+        if (isCorrect) color = [0, 128, 0]; // green
+        else color = [255, 204, 0]; // yellow for unselected
+      } else if (isSelected && isCorrect) {
+        color = [0, 128, 0]; // green
+      } else if (isSelected && !isCorrect) {
+        color = [255, 0, 0]; // red
+      } else if (isCorrect) {
+        color = [0, 128, 0]; // green
+      }
+
+      // Draw colored circle
+      doc.setDrawColor(...color);
+      doc.setFillColor(...color);
+      doc.circle(cx, y + 5, circleRadius, 'F');
+
+      // Draw option letter inside circle
       doc.setTextColor(0, 0, 0);
+      doc.setFontSize(12);
       doc.setFont(undefined, 'bold');
-      doc.text(`Q${qNum}`, x + 3, rowY + 1.5);
+      doc.text(opt.toLowerCase(), cx - 1.5, y + 5.5);
 
-      const options = ['A', 'B', 'C', 'D'];
-      const optionStartX = x + 20;
-      const spacing = 14;
-
-      options.forEach((opt, optIdx) => {
-        const cx = optionStartX + optIdx * spacing;
-
-        let fill = [255, 255, 255];
-        let stroke = [0, 0, 0];
-        let textColor = [0, 0, 0];
-        let fontStyle = 'normal';
-
-        const isSelected = res.selectedOption === opt;
-        const isCorrect = res.correctOption === opt;
-        const missed = res.missed;
-
-        if (missed) {
-          if (isCorrect) {
-            fill = [0, 128, 0];
-            textColor = [255, 255, 255];
-          } else {
-            stroke = [255, 204, 0];
-          }
-        } else if (isSelected && isCorrect) {
-          fill = [0, 128, 0];
-          textColor = [255, 255, 255];
-          fontStyle = 'bold';
-        } else if (isSelected && !isCorrect) {
-          fill = [255, 0, 0];
-          textColor = [255, 255, 255];
-          fontStyle = 'bold';
-        } else if (isCorrect) {
-          fill = [0, 128, 0];
-          textColor = [255, 255, 255];
-          fontStyle = 'italic';
-        }
-
-        doc.setDrawColor(...stroke);
-        doc.setFillColor(...fill);
-        doc.circle(cx, rowY, r, 'FD');
-
-        doc.setTextColor(...textColor);
-        doc.setFont(undefined, fontStyle);
-        doc.setFontSize(7);
-        doc.text(opt.toLowerCase(), cx - 1.5, rowY + 2.2);
-      });
+      cx += optionGap;
     });
   }
 }
